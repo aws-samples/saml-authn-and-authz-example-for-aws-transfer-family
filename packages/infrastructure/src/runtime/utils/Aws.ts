@@ -116,6 +116,8 @@ export interface AwsApiCalls {
     clientName: string,
     userPoolId: string,
   ): Promise<UserPoolClientType | undefined>;
+
+  generateRandomString(len: number): string;
 }
 
 export class Aws implements AwsApiCalls {
@@ -355,6 +357,19 @@ export class Aws implements AwsApiCalls {
           }
         }
       }
+    }
+    return result;
+  }
+
+  generateRandomString(len: number): string {
+    let result = "";
+    const characters =
+      "ABCDEFGHIJKLMNPQRSTUVWXYZabcdefghijklmnpqrstuvwxyz123456789!#^_-+=~?";
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < len) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
     }
     return result;
   }

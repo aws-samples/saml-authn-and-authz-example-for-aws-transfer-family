@@ -113,7 +113,7 @@ export class CognitoAuthorization extends Construct implements IDependable {
 			scopes: [scope],
 			userPoolResourceServerName: clientName
 		})
-		const clientScopes = [OAuthScope.resourceServer(resourceServer, scope)]
+		const clientScopes = [OAuthScope.resourceServer(resourceServer, scope), OAuthScope.OPENID, OAuthScope.EMAIL]
 		this.userPool.addClient(`${clientName}AuthorizationCodeClient`, {
 			authFlows: {
 				userSrp: false,
@@ -134,7 +134,6 @@ export class CognitoAuthorization extends Construct implements IDependable {
 
 			},
 		});
-
 
 
 	}

@@ -10,6 +10,7 @@ import {Aws, RemovalPolicy} from "aws-cdk-lib";
 import {Layers} from "./Layers";
 import {AwsCustomResource, AwsCustomResourcePolicy, PhysicalResourceId} from "aws-cdk-lib/custom-resources";
 import {AttributeMapping, UserPoolIdentityProviderSaml, UserPoolIdentityProviderSamlMetadataType} from "aws-cdk-lib/aws-cognito";
+import {AttributeType, TableV2} from "aws-cdk-lib/aws-dynamodb";
 
 export interface SamlIdp {
 	name: string,
@@ -48,10 +49,18 @@ export class ATFServerWithSaml extends Construct {
 		})
 		this.cognitoAuthorization = new CognitoAuthorization(this, "Cognito", {})
 		const layers = new Layers(this, "Layers")
-
+		const table = new TableV2(this, "Table", {
+			removalPolicy: RemovalPolicy.DESTROY,
+			timeToLiveAttribute: "ttl",
+			partitionKey: {
+				type: AttributeType.STRING,
+				name: "pk"
+			}
+		})
 		this.lambdas = new Lambdas(this, "Lambdas", {
 			layers,
-			cognitoAuthorization: this.cognitoAuthorization
+			cognitoAuthorization: this.cognitoAuthorization,
+			table: table
 		})
 
 		this.api = new Api(this, "Api", {
@@ -147,8 +156,6 @@ export class ATFServerWithSaml extends Construct {
 		createFolder.node.addDependency(this.bucket)
 
 	}
-
-
 
 
 }

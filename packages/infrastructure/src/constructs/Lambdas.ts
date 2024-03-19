@@ -9,13 +9,14 @@ import {Construct, Dependable, IDependable} from 'constructs';
 import {Layers} from './Layers';
 import {CognitoAuthorization} from "./CognitoAuthorization";
 import {PolicyStatement} from "aws-cdk-lib/aws-iam";
-
+import {ITableV2} from "aws-cdk-lib/aws-dynamodb";
 
 
 export interface LambdasConfig {
 
 	layers: Layers;
 	cognitoAuthorization: CognitoAuthorization
+	table: ITableV2
 }
 
 
@@ -67,7 +68,8 @@ export class Lambdas extends Construct implements IDependable {
 			handler: 'index.onEvent',
 			code: Code.fromAsset(path.join(__dirname, '..', '..', 'dist', 'ATFServerIdentityProvider.zip')),
 			environment: {
-				LOG_LEVEL: "DEBUG"
+				LOG_LEVEL: "DEBUG",
+				TABLE_NAME: config.table.tableName,
 			},
 			memorySize: 256,
 			architecture: Architecture.ARM_64,
@@ -87,7 +89,8 @@ export class Lambdas extends Construct implements IDependable {
 			environment: {
 				LOG_LEVEL: "DEBUG",
 				USER_POOL_ID: config.cognitoAuthorization.userPool.userPoolId,
-				COGNITO_URL: config.cognitoAuthorization.cognitoDomain.baseUrl()
+				COGNITO_URL: config.cognitoAuthorization.cognitoDomain.baseUrl(),
+				TABLE_NAME: config.table.tableName,
 			},
 			memorySize: 256,
 			architecture: Architecture.ARM_64,
@@ -126,5 +129,7 @@ export class Lambdas extends Construct implements IDependable {
 
 		});
 
+		config.table.grantWriteData(this.samlCallbackHandler);
+		config.table.grantReadData(this.identityProviderRouter);
 	}
 }

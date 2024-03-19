@@ -1,6 +1,8 @@
+import { marshall } from "@aws-sdk/util-dynamodb";
 import { APIGatewayProxyEvent, Callback, Context } from "aws-lambda";
 import { APIGatewayProxyResult } from "aws-lambda/trigger/api-gateway-proxy";
 
+import { jwtDecode } from "jwt-decode";
 import {
   APIGatewayProxyLambdaHandler,
   Aws,
@@ -42,7 +44,7 @@ export const onEventHandler: APIGatewayProxyLambdaHandler = async (
 
   const userPoolClient = await tools.aws.findUserPoolClient(
     `${providerName}-authorization-code-client`,
-    process.env.USER_POOL_ID!
+    process.env.USER_POOL_ID!,
   );
   const clientId = userPoolClient?.ClientId;
   // const clientSecret = userPooolClient?.ClientSecret;
@@ -61,29 +63,54 @@ export const onEventHandler: APIGatewayProxyLambdaHandler = async (
     formFields.push(encodedKey + "=" + encodedValue);
   }
   const formBody = formFields.join("&");
-  const request = new Request(tokenEndpoint, {
+  const tokenRequest = new Request(tokenEndpoint, {
     body: formBody,
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
   });
-  logger.info(`Request: ${JSON.stringify(request)}`);
-  const response = await fetch(request);
-  const body = await response.text();
-  logger.info(`response: ${body}`);
-  // const jwtPayload = jwtDecode(accessToken);
-  // logger.info(`JWT Payload: ${JSON.stringify(jwtPayload)}`);
-  // //@ts-ignore
-  // const clientId = jwtPayload.client_id;
-  // const jwtVerifier=CognitoJwtVerifier.create({
-  //   userPoolId: process.env.USER_POOL_ID!,
-  //   tokenUse: "access",
-  //   clientId: process.env.USER_POOL_CLIENT_ID,
-  // })
+  logger.info(`Request: ${JSON.stringify(tokenRequest)}`);
+  const tokenResponse = await fetch(tokenRequest);
+  const body = (await tokenResponse.json()) as Record<string, any>;
+  logger.info(`Response: ${JSON.stringify(body)}`);
+  const accessToken = body.access_token;
+  const jwtPayload = jwtDecode(accessToken);
+
+  const userInfoEndpoint = `${process.env.COGNITO_URL}/oauth2/userInfo`;
+  const userInfoRequest = new Request(userInfoEndpoint, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  const userInfoResponse = await fetch(userInfoRequest);
+  const userInfo = (await userInfoResponse.json()) as Record<string, any>;
+  logger.info(`Response: ${JSON.stringify(userInfo)}`);
+  const email = userInfo.email;
+  logger.info(`Email: ${email}`);
+  //generate a password
+  const password = tools.aws.generateRandomString(9);
+  await tools.aws.putItem({
+    TableName: process.env.TABLE_NAME,
+    Item: marshall({
+      pk: `${email}`,
+      password: password,
+      accessToken: accessToken,
+      ttl: jwtPayload.exp,
+    }),
+  });
+
   return {
+    headers: {
+      "Content-Type": "application/json",
+    },
     statusCode: 200,
-    body: body,
+    body: JSON.stringify({
+      username: email,
+      password: password,
+    }),
   };
 };
 

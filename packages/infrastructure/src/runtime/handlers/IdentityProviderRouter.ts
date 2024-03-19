@@ -75,7 +75,7 @@ export const onEventHandler: APIGatewayProxyLambdaHandler = async (
             );
             const callbackUrl = userPoolClient.CallbackURLs[0];
             const clientId = userPoolClient.ClientId!;
-            const scope = `${providerName}/transfer`;
+            const scope = `${providerName}/transfer+openid+email`;
             response = redirectToLogin(
               providerName,
               clientId,
