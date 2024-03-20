@@ -2,6 +2,7 @@ import { marshall } from "@aws-sdk/util-dynamodb";
 import { CognitoJwtVerifier } from "aws-jwt-verify";
 import { APIGatewayProxyEvent, Callback, Context } from "aws-lambda";
 import { APIGatewayProxyResult } from "aws-lambda/trigger/api-gateway-proxy";
+import { safeName } from "../../index";
 import {
   APIGatewayProxyLambdaHandlerWithJwtVerifier,
   Aws,
@@ -28,39 +29,11 @@ interface Response {
   HomeDirectory?: string;
 }
 
-const defaultPolicy = {
-  Version: "2012-10-17",
-  Statement: [
-    {
-      Sid: "AllowListingOfUserFolder",
-      Action: ["s3:ListBucket"],
-      Effect: "Allow",
-      Resource: ["arn:aws:s3:::${transfer:HomeBucket}"],
-      Condition: {
-        StringLike: {
-          "s3:prefix": ["${transfer:HomeFolder}/*", "${transfer:HomeFolder}"],
-        },
-      },
-    },
-    {
-      Sid: "HomeDirObjectAccess",
-      Effect: "Allow",
-      Action: [
-        "s3:PutObject",
-        "s3:GetObject",
-        "s3:DeleteObject",
-        "s3:GetObjectVersion",
-      ],
-      Resource: "arn:aws:s3:::${transfer:HomeDirectory}*",
-    },
-  ],
-};
-
 export const onEventHandler: APIGatewayProxyLambdaHandlerWithJwtVerifier<
   any
 > = async (
   event: APIGatewayProxyEvent,
-  _context: Context,
+  context: Context,
   _callback: Callback<APIGatewayProxyResult>,
   tools: LambdaToolsWithJwtVerifier<any> = {
     aws: Aws.instance({}, powertools),
@@ -103,14 +76,20 @@ export const onEventHandler: APIGatewayProxyLambdaHandlerWithJwtVerifier<
       });
       logger.info(`Authenticated user ${username}`);
       const userInfo = auth.userInfo;
+      const domain = `@${userInfo.email.split("@")[1]}`;
+      const safeDomainName = safeName(domain);
+      const accountId = context.invokedFunctionArn.split(":")[4];
+      const region = context.invokedFunctionArn.split(":")[3];
+      const bucketName = `atf-with-saml-${accountId}-${region}-${safeDomainName}`;
+      const roleArn: string = `arn:aws:iam::${accountId}:role/atf-with-saml-role-${safeDomainName}`;
       const homeDirectoryDetails = [
         {
           Entry: "/",
-          Target: `/${process.env.BUCKET_NAME}/@${userInfo.email.split("@")[1]}`,
+          Target: `/${bucketName}`,
         },
       ];
       response = {
-        Role: process.env.BUCKET_ROLE_ARN!,
+        Role: roleArn,
         HomeDirectoryType: HomeDirectoryType.LOGICAL,
         HomeDirectoryDetails: JSON.stringify(homeDirectoryDetails),
       };

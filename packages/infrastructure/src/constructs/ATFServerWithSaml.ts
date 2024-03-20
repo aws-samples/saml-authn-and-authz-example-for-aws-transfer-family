@@ -8,9 +8,9 @@ import {BlockPublicAccess, Bucket, IBucket} from "aws-cdk-lib/aws-s3";
 import {LogGroup, RetentionDays} from "aws-cdk-lib/aws-logs";
 import {Aws, RemovalPolicy} from "aws-cdk-lib";
 import {Layers} from "./Layers";
-import {AwsCustomResource, AwsCustomResourcePolicy, PhysicalResourceId} from "aws-cdk-lib/custom-resources";
 import {AttributeMapping, UserPoolIdentityProviderSaml, UserPoolIdentityProviderSamlMetadataType} from "aws-cdk-lib/aws-cognito";
 import {AttributeType, TableV2} from "aws-cdk-lib/aws-dynamodb";
+import {safeName} from "../index";
 
 export interface SamlIdp {
 	name: string,
@@ -22,56 +22,19 @@ export class ATFServerWithSaml extends Construct {
 	private readonly cognitoAuthorization: CognitoAuthorization;
 	private readonly lambdas: Lambdas;
 	private readonly api: Api;
-	private readonly bucket: IBucket
+
+	private accessLogsBucket: IBucket;
 
 	constructor(scope: Construct, id: string) {
 		super(scope, id);//create bucket for access logs
-		//s3 bucket with an access logging bucket
-		const accessLogsBucket = new Bucket(this, "AccessLogsBucket", {
+
+		this.accessLogsBucket = new Bucket(this, "AccessLogsBucket", {
 			removalPolicy: RemovalPolicy.DESTROY,
 			autoDeleteObjects: true,
 			blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
 			bucketName: `atf-with-saml-access-logs-${Aws.ACCOUNT_ID}-${Aws.REGION}`,
 			enforceSSL: true
 		});
-		this.bucket = new Bucket(this, "TransferFamilyBucket", {
-			removalPolicy: RemovalPolicy.DESTROY,
-			autoDeleteObjects: true,
-			blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
-			bucketName: `atf-with-saml-${Aws.ACCOUNT_ID}-${Aws.REGION}`,
-			serverAccessLogsBucket: accessLogsBucket,
-			enforceSSL: true
-		});
-		const role = new Role(this, "ATFServerWithSamlS3AccessRole", {
-			assumedBy: new ServicePrincipal("transfer.amazonaws.com"),
-			roleName: "ATFServerWithSamlS3AccessRole",
-			description: "Role for ATF Server With SAML to access S3 Bucket",
-			inlinePolicies: {
-				"0": new PolicyDocument({
-					statements: [new PolicyStatement({
-						sid: "AllowListingOfUserFolder",
-						actions: ["s3:ListBucket",
-							"s3:GetBucketLocation"],
-						effect: Effect.ALLOW,
-						resources: [this.bucket.bucketArn]
-					}),
-						new PolicyStatement({
-							sid: "HomeDirObjectAccess",
-							actions: ["s3:PutObject",
-								"s3:GetObject",
-								"s3:DeleteObject",
-								"s3:DeleteObjectVersion",
-								"s3:GetObjectVersion",
-								"s3:GetObjectACL",
-								"s3:PutObjectACL"],
-							effect: Effect.ALLOW,
-							resources: [this.bucket.arnForObjects("*")]
-
-						})]
-				})
-			}
-		})
-
 		const serverLogGroup = new LogGroup(this, "ServerLogGroup", {
 			removalPolicy: RemovalPolicy.DESTROY,
 			retention: RetentionDays.ONE_DAY,
@@ -90,9 +53,7 @@ export class ATFServerWithSaml extends Construct {
 		this.lambdas = new Lambdas(this, "Lambdas", {
 			layers,
 			cognitoAuthorization: this.cognitoAuthorization,
-			table: table,
-			bucketRole: role,
-			bucketName: this.bucket.bucketName,
+			table: table
 		})
 
 		this.api = new Api(this, "Api", {
@@ -159,8 +120,45 @@ export class ATFServerWithSaml extends Construct {
 				return messages;
 			},
 		});
-		const safeName = idp.name.replace(/[^a-zA-Z0-9]/g, '');
-		const identityProvider = new UserPoolIdentityProviderSaml(this, `${safeName}Idp`, {
+		const safeIdpName = safeName(idp.name);
+		const idpBucket = new Bucket(this, `${safeIdpName}TransferFamilyBucket`, {
+			removalPolicy: RemovalPolicy.DESTROY,
+			autoDeleteObjects: true,
+			blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+			bucketName: `atf-with-saml-${Aws.ACCOUNT_ID}-${Aws.REGION}-${safeIdpName}`,
+			serverAccessLogsBucket: this.accessLogsBucket,
+			enforceSSL: true
+		});
+		new Role(this, `${safeIdpName}ATFServerWithSamlS3AccessRole`, {
+			assumedBy: new ServicePrincipal("transfer.amazonaws.com"),
+			roleName: `atf-with-saml-role-${safeIdpName}`,
+			description: `Role for ATF Server With SAML to access ${idpBucket.bucketName}`,
+			inlinePolicies: {
+				"0": new PolicyDocument({
+					statements: [new PolicyStatement({
+						sid: "AllowListingOfUserFolder",
+						actions: ["s3:ListBucket",
+							"s3:GetBucketLocation"],
+						effect: Effect.ALLOW,
+						resources: [idpBucket.bucketArn]
+					}),
+						new PolicyStatement({
+							sid: "HomeDirObjectAccess",
+							actions: ["s3:PutObject",
+								"s3:GetObject",
+								"s3:DeleteObject",
+								"s3:DeleteObjectVersion",
+								"s3:GetObjectVersion",
+								"s3:GetObjectACL",
+								"s3:PutObjectACL"],
+							effect: Effect.ALLOW,
+							resources: [idpBucket.arnForObjects("*")]
+
+						})]
+				})
+			}
+		})
+		const identityProvider = new UserPoolIdentityProviderSaml(this, `${safeIdpName}Idp`, {
 			metadata: {
 				metadataContent: idp.metadataUrl,
 				metadataType: UserPoolIdentityProviderSamlMetadataType.URL
@@ -172,20 +170,7 @@ export class ATFServerWithSaml extends Construct {
 
 		})
 		this.cognitoAuthorization.addClient(idp.name, this.api.urlForPath("/saml/callback"), identityProvider)
-		const createFolder = new AwsCustomResource(this, `${safeName}CreateFolder`, {
-			onCreate: {
-				service: 'S3',
-				action: 'putObject',
-				parameters: {
-					Bucket: this.bucket.bucketName,
-					Key: `${idp.name}/`,
-				},
-				physicalResourceId: PhysicalResourceId.of(`${safeName}CreateFolder`),
-			},
-			policy: AwsCustomResourcePolicy.fromSdkCalls({resources: AwsCustomResourcePolicy.ANY_RESOURCE}),
-			installLatestAwsSdk: true,
-		});
-		createFolder.node.addDependency(this.bucket)
+
 
 	}
 

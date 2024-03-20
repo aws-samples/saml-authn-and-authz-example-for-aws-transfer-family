@@ -81,7 +81,9 @@ describe('ATFServerIdentityProvider', () => {
 		const verifier = stub(verifierInstance);
 
 		// @ts-ignore
-		const response = await onEventHandler(event, {}, (_error, _result) => {
+		const response = await onEventHandler(event, {
+			invokedFunctionArn:"arn:aws:lambda:us-east-2:123456789012:function:ATFServerIdentityProvider"
+		}, (_error, _result) => {
 		}, {
 			aws: stubbedAws,
 			powertools,
@@ -89,6 +91,6 @@ describe('ATFServerIdentityProvider', () => {
 		}) as APIGatewayProxyResult
 		expect(response).toBeDefined()
 		expect(response.statusCode).toBe(200)
-		expect(response.body).toEqual(JSON.stringify({"HomeDirectoryType":"LOGICAL","HomeDirectoryDetails":"[{\"Entry\":\"/\",\"Target\":\"/undefined/@institution01.edu\"}]","Policy":"{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"AllowListingOfUserFolder\",\"Action\":[\"s3:ListBucket\"],\"Effect\":\"Allow\",\"Resource\":[\"arn:aws:s3:::${transfer:HomeBucket}\"],\"Condition\":{\"StringLike\":{\"s3:prefix\":[\"${transfer:HomeFolder}/*\",\"${transfer:HomeFolder}\"]}}},{\"Sid\":\"HomeDirObjectAccess\",\"Effect\":\"Allow\",\"Action\":[\"s3:PutObject\",\"s3:GetObject\",\"s3:DeleteObject\",\"s3:GetObjectVersion\"],\"Resource\":\"arn:aws:s3:::${transfer:HomeDirectory}*\"}]}"}))
+		expect(response.body).toEqual(JSON.stringify({"Role":"arn:aws:iam::123456789012:role/atf-with-saml-role-institution01edu","HomeDirectoryType":"LOGICAL","HomeDirectoryDetails":"[{\"Entry\":\"/\",\"Target\":\"/atf-with-saml-123456789012-us-east-2-institution01edu\"}]"}))
 	})
 })

@@ -16,7 +16,7 @@
  */
 
 import {Construct, Dependable, IDependable} from "constructs";
-import {AdvancedSecurityMode, CustomDomainOptions, OAuthScope, ResourceServerScope, UserPool, UserPoolClientIdentityProvider, UserPoolDomain, UserPoolIdentityProviderSaml} from "aws-cdk-lib/aws-cognito";
+import {AdvancedSecurityMode, CustomDomainOptions, OAuthScope, UserPool, UserPoolClientIdentityProvider, UserPoolDomain, UserPoolIdentityProviderSaml} from "aws-cdk-lib/aws-cognito";
 
 import {Aws, CfnOutput, Duration, RemovalPolicy} from "aws-cdk-lib";
 
@@ -103,17 +103,9 @@ export class CognitoAuthorization extends Construct implements IDependable {
 	}
 
 	addClient(clientName: string, callbackUrl: string, identityProvider: UserPoolIdentityProviderSaml) {
-		const safeClientName = clientName.replace(/[^a-zA-Z0-9]/g, '');
-		const scope = new ResourceServerScope({
-			scopeDescription: "Access ATF Folder",
-			scopeName: "transfer"
-		})
-		const resourceServer = this.userPool.addResourceServer(`${safeClientName}ResourceServer`, {
-			identifier: clientName,
-			scopes: [scope],
-			userPoolResourceServerName: clientName
-		})
-		const clientScopes = [OAuthScope.resourceServer(resourceServer, scope), OAuthScope.OPENID, OAuthScope.EMAIL]
+
+
+		const clientScopes = [OAuthScope.OPENID, OAuthScope.EMAIL]
 		this.userPool.addClient(`${clientName}AuthorizationCodeClient`, {
 			authFlows: {
 				userSrp: false,
