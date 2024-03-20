@@ -17,7 +17,18 @@ new TransferFamilyWithSamlStack(app, 'aws-transfer-family-with-saml', {
 	env: devEnv,
 	samlIdps: [{
 		name: "@institution01.edu",
-		metadataUrl: "https://shib.awsgalen.com/simplesaml/module.php/saml/idp/metadata",
+		metadataUrl: "https://saml.institution01.awsgalen.com/simplesaml/module.php/saml/idp/metadata",
+		attributeMap: {
+			email: ProviderAttribute.other("mail"),
+			givenName: ProviderAttribute.other("givenName"),
+			familyName: ProviderAttribute.other("sn"),
+			custom: {
+				email_verified: ProviderAttribute.other("email_verified")
+			}
+		}
+	},{
+		name: "@institution02.edu",
+		metadataUrl: "https://saml.institution02.awsgalen.com/simplesaml/module.php/saml/idp/metadata",
 		attributeMap: {
 			email: ProviderAttribute.other("mail"),
 			givenName: ProviderAttribute.other("givenName"),
