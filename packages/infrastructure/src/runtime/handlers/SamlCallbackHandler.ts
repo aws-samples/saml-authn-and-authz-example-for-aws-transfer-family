@@ -99,6 +99,8 @@ export const onEventHandler: APIGatewayProxyLambdaHandler = async (
       password: password,
       accessToken: accessToken,
       ttl: jwtPayload.exp,
+      userPoolClientId: clientId,
+      userInfo: userInfo,
     }),
   });
 
@@ -110,6 +112,7 @@ export const onEventHandler: APIGatewayProxyLambdaHandler = async (
     body: JSON.stringify({
       username: email,
       password: password,
+      expires: jwtPayload.exp,
     }),
   };
 };

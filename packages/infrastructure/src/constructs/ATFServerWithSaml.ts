@@ -42,6 +42,36 @@ export class ATFServerWithSaml extends Construct {
 			serverAccessLogsBucket: accessLogsBucket,
 			enforceSSL: true
 		});
+		const role = new Role(this, "ATFServerWithSamlS3AccessRole", {
+			assumedBy: new ServicePrincipal("transfer.amazonaws.com"),
+			roleName: "ATFServerWithSamlS3AccessRole",
+			description: "Role for ATF Server With SAML to access S3 Bucket",
+			inlinePolicies: {
+				"0": new PolicyDocument({
+					statements: [new PolicyStatement({
+						sid: "AllowListingOfUserFolder",
+						actions: ["s3:ListBucket",
+							"s3:GetBucketLocation"],
+						effect: Effect.ALLOW,
+						resources: [this.bucket.bucketArn]
+					}),
+						new PolicyStatement({
+							sid: "HomeDirObjectAccess",
+							actions: ["s3:PutObject",
+								"s3:GetObject",
+								"s3:DeleteObject",
+								"s3:DeleteObjectVersion",
+								"s3:GetObjectVersion",
+								"s3:GetObjectACL",
+								"s3:PutObjectACL"],
+							effect: Effect.ALLOW,
+							resources: [this.bucket.arnForObjects("*")]
+
+						})]
+				})
+			}
+		})
+
 		const serverLogGroup = new LogGroup(this, "ServerLogGroup", {
 			removalPolicy: RemovalPolicy.DESTROY,
 			retention: RetentionDays.ONE_DAY,
@@ -60,7 +90,9 @@ export class ATFServerWithSaml extends Construct {
 		this.lambdas = new Lambdas(this, "Lambdas", {
 			layers,
 			cognitoAuthorization: this.cognitoAuthorization,
-			table: table
+			table: table,
+			bucketRole: role,
+			bucketName: this.bucket.bucketName,
 		})
 
 		this.api = new Api(this, "Api", {
