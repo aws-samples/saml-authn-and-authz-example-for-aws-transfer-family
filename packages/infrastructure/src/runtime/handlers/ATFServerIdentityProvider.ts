@@ -3,13 +3,7 @@ import { CognitoJwtVerifier } from "aws-jwt-verify";
 import { APIGatewayProxyEvent, Callback, Context } from "aws-lambda";
 import { APIGatewayProxyResult } from "aws-lambda/trigger/api-gateway-proxy";
 import { safeName } from "../../index";
-import {
-  APIGatewayProxyLambdaHandlerWithJwtVerifier,
-  Aws,
-  LambdaToolsWithJwtVerifier,
-  Powertools,
-  SimpleJwksCacheSingleton,
-} from "../utils/";
+import { APIGatewayProxyLambdaHandlerWithJwtVerifier, Aws, LambdaToolsWithJwtVerifier, Powertools, SimpleJwksCacheSingleton } from "../utils/";
 
 const powertools = new Powertools({
   serviceName: "ATFServerIdentityProvider",
@@ -29,9 +23,7 @@ interface Response {
   HomeDirectory?: string;
 }
 
-export const onEventHandler: APIGatewayProxyLambdaHandlerWithJwtVerifier<
-  any
-> = async (
+export const onEventHandler: APIGatewayProxyLambdaHandlerWithJwtVerifier<any> = async (
   event: APIGatewayProxyEvent,
   context: Context,
   _callback: Callback<APIGatewayProxyResult>,

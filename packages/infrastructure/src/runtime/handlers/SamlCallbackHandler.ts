@@ -3,12 +3,7 @@ import { APIGatewayProxyEvent, Callback, Context } from "aws-lambda";
 import { APIGatewayProxyResult } from "aws-lambda/trigger/api-gateway-proxy";
 
 import { jwtDecode } from "jwt-decode";
-import {
-  APIGatewayProxyLambdaHandler,
-  Aws,
-  BasicLambdaTools,
-  Powertools,
-} from "../utils/";
+import { APIGatewayProxyLambdaHandler, Aws, BasicLambdaTools, Powertools } from "../utils/";
 
 const powertools = new Powertools({
   serviceName: "SamlCallbackHandler",
@@ -42,10 +37,7 @@ export const onEventHandler: APIGatewayProxyLambdaHandler = async (
     logger.info(`providerName: ${providerName}`);
   }
 
-  const userPoolClient = await tools.aws.findUserPoolClient(
-    `${providerName}-authorization-code-client`,
-    process.env.USER_POOL_ID!,
-  );
+  const userPoolClient = await tools.aws.findUserPoolClient(`${providerName}-authorization-code-client`, process.env.USER_POOL_ID!);
   const clientId = userPoolClient?.ClientId;
   // const clientSecret = userPooolClient?.ClientSecret;
   // const authorization = btoa(`${clientId}:${clientSecret}`);

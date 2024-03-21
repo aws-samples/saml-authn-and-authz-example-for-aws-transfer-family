@@ -1,14 +1,8 @@
-import {
-  CognitoJwtVerifierProperties,
-  CognitoJwtVerifierSingleUserPool,
-} from "aws-jwt-verify/cognito-verifier";
+import { CognitoJwtVerifierProperties, CognitoJwtVerifierSingleUserPool } from "aws-jwt-verify/cognito-verifier";
 import { SimpleJwksCache } from "aws-jwt-verify/jwk";
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { Callback, Context, Handler } from "aws-lambda/handler";
-import {
-  APIGatewayProxyHandler,
-  APIGatewayProxyResult,
-} from "aws-lambda/trigger/api-gateway-proxy";
+import { APIGatewayProxyHandler, APIGatewayProxyResult } from "aws-lambda/trigger/api-gateway-proxy";
 import { AwsApiCalls } from "./Aws";
 import { Powertools } from "./Powertools";
 
@@ -20,9 +14,7 @@ export interface BasicLambdaTools {
   powertools: Powertools;
 }
 
-export interface LambdaToolsWithJwtVerifier<
-  T extends CognitoJwtVerifierProperties,
-> extends BasicLambdaTools {
+export interface LambdaToolsWithJwtVerifier<T extends CognitoJwtVerifierProperties> extends BasicLambdaTools {
   verifier: CognitoJwtVerifierSingleUserPool<T>;
 }
 
@@ -38,18 +30,8 @@ export class SimpleJwksCacheSingleton {
 }
 
 export type LambdaHandler<TEvent = any, TResult = any> =
-  Handler<TEvent, TResult> extends (
-    event: TEvent,
-    context: Context,
-    callback: Callback<TResult>,
-    tools: BasicLambdaTools,
-  ) => infer R
-    ? (
-        event: TEvent,
-        context: Context,
-        callback: Callback<TResult>,
-        tools: BasicLambdaTools,
-      ) => R
+  Handler<TEvent, TResult> extends (event: TEvent, context: Context, callback: Callback<TResult>, tools: BasicLambdaTools) => infer R
+    ? (event: TEvent, context: Context, callback: Callback<TResult>, tools: BasicLambdaTools) => R
     : never;
 
 export type APIGatewayProxyLambdaHandler = APIGatewayProxyHandler extends (
@@ -58,26 +40,14 @@ export type APIGatewayProxyLambdaHandler = APIGatewayProxyHandler extends (
   callback: Callback<APIGatewayProxyResult>,
   tools: BasicLambdaTools,
 ) => infer R
-  ? (
-      event: APIGatewayProxyEvent,
-      context: Context,
-      callback: Callback<APIGatewayProxyResult>,
-      tools: BasicLambdaTools,
-    ) => R
+  ? (event: APIGatewayProxyEvent, context: Context, callback: Callback<APIGatewayProxyResult>, tools: BasicLambdaTools) => R
   : never;
 
-export type APIGatewayProxyLambdaHandlerWithJwtVerifier<
-  T extends CognitoJwtVerifierProperties,
-> = APIGatewayProxyLambdaHandler extends (
+export type APIGatewayProxyLambdaHandlerWithJwtVerifier<T extends CognitoJwtVerifierProperties> = APIGatewayProxyLambdaHandler extends (
   event: APIGatewayProxyEvent,
   context: Context,
   callback: Callback<APIGatewayProxyResult>,
   tools: LambdaToolsWithJwtVerifier<T>,
 ) => infer R
-  ? (
-      event: APIGatewayProxyEvent,
-      context: Context,
-      callback: Callback<APIGatewayProxyResult>,
-      tools: LambdaToolsWithJwtVerifier<T>,
-    ) => R
+  ? (event: APIGatewayProxyEvent, context: Context, callback: Callback<APIGatewayProxyResult>, tools: LambdaToolsWithJwtVerifier<T>) => R
   : never;

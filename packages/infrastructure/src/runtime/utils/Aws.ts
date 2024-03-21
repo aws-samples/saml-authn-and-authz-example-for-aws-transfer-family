@@ -42,18 +42,10 @@ import {
   UpdateItemCommandInput,
   UpdateItemCommandOutput,
 } from "@aws-sdk/client-dynamodb";
-import {
-  GetParameterCommand,
-  GetParameterCommandInput,
-  GetParameterCommandOutput,
-  SSMClient,
-} from "@aws-sdk/client-ssm";
+import { GetParameterCommand, GetParameterCommandInput, GetParameterCommandOutput, SSMClient } from "@aws-sdk/client-ssm";
 
 import { Paginator } from "@aws-sdk/types";
-import {
-  marshall as ddbMarshal,
-  unmarshall as ddbUnmarshal,
-} from "@aws-sdk/util-dynamodb";
+import { marshall as ddbMarshal, unmarshall as ddbUnmarshal } from "@aws-sdk/util-dynamodb";
 
 import { Powertools } from "./Powertools";
 
@@ -64,9 +56,7 @@ export type PaginationConfig = {
 };
 
 export interface AwsApiCalls {
-  getParameter(
-    input: GetParameterCommandInput,
-  ): Promise<GetParameterCommandOutput>;
+  getParameter(input: GetParameterCommandInput): Promise<GetParameterCommandOutput>;
 
   updateItem(input: UpdateItemCommandInput): Promise<UpdateItemCommandOutput>;
 
@@ -74,57 +64,33 @@ export interface AwsApiCalls {
 
   scan(input: ScanCommandInput): Promise<Record<string, any>[] | undefined>;
 
-  transactWriteItems(
-    input: TransactWriteItemsCommandInput,
-  ): Promise<TransactWriteItemsCommandOutput>;
+  transactWriteItems(input: TransactWriteItemsCommandInput): Promise<TransactWriteItemsCommandOutput>;
 
   putItem(input: PutItemInput): Promise<PutItemCommandOutput>;
 
   query(input: QueryCommandInput): Promise<QueryCommandOutput>;
 
-  adminCreateUser(
-    input: AdminCreateUserCommandInput,
-  ): Promise<AdminCreateUserCommandOutput>;
+  adminCreateUser(input: AdminCreateUserCommandInput): Promise<AdminCreateUserCommandOutput>;
 
-  adminGetUser(
-    input: AdminGetUserCommandInput,
-  ): Promise<AdminGetUserCommandOutput>;
+  adminGetUser(input: AdminGetUserCommandInput): Promise<AdminGetUserCommandOutput>;
 
-  adminUpdateUserAttributes(
-    input: AdminUpdateUserAttributesCommandInput,
-  ): Promise<AdminUpdateUserAttributesCommandOutput>;
+  adminUpdateUserAttributes(input: AdminUpdateUserAttributesCommandInput): Promise<AdminUpdateUserAttributesCommandOutput>;
 
-  paginateScan(
-    config: PaginationConfig,
-    input: ScanCommandInput,
-    ...additionalArguments: any
-  ): Paginator<ScanCommandOutput>;
+  paginateScan(config: PaginationConfig, input: ScanCommandInput, ...additionalArguments: any): Paginator<ScanCommandOutput>;
 
-  describeIdentityProvider(
-    input: DescribeIdentityProviderCommandInput,
-  ): Promise<DescribeIdentityProviderCommandOutput>;
+  describeIdentityProvider(input: DescribeIdentityProviderCommandInput): Promise<DescribeIdentityProviderCommandOutput>;
 
-  describeUserPoolClient(
-    input: DescribeUserPoolClientCommandInput,
-  ): Promise<DescribeUserPoolClientCommandOutput>;
+  describeUserPoolClient(input: DescribeUserPoolClientCommandInput): Promise<DescribeUserPoolClientCommandOutput>;
 
-  paginateListUserPoolClients(
-    input: ListUserPoolClientsCommandInput,
-  ): Paginator<ListUserPoolClientsCommandOutput>;
+  paginateListUserPoolClients(input: ListUserPoolClientsCommandInput): Paginator<ListUserPoolClientsCommandOutput>;
 
-  findUserPoolClient(
-    clientName: string,
-    userPoolId: string,
-  ): Promise<UserPoolClientType | undefined>;
+  findUserPoolClient(clientName: string, userPoolId: string): Promise<UserPoolClientType | undefined>;
 
   generateRandomString(len: number): string;
 }
 
 export class Aws implements AwsApiCalls {
-  static instance(
-    config: { [key: string]: any | undefined } = {},
-    powertools: Powertools | undefined,
-  ) {
+  static instance(config: { [key: string]: any | undefined } = {}, powertools: Powertools | undefined) {
     if (this._instance == undefined) {
       this._instance = new Aws(config, powertools);
     }
@@ -141,18 +107,12 @@ export class Aws implements AwsApiCalls {
   private config: { [key: string]: any | undefined };
   private _powertools: Powertools | undefined;
 
-  private constructor(
-    config: { [key: string]: any | undefined } = {},
-    powertools: Powertools | undefined,
-  ) {
+  private constructor(config: { [key: string]: any | undefined } = {}, powertools: Powertools | undefined) {
     this.config = config;
     this._powertools = powertools;
   }
 
-  public newInstance(
-    config: { [key: string]: any | undefined } = {},
-    powertools: Powertools | undefined,
-  ): AwsApiCalls {
+  public newInstance(config: { [key: string]: any | undefined } = {}, powertools: Powertools | undefined): AwsApiCalls {
     return new Aws(config, powertools);
   }
 
@@ -198,21 +158,15 @@ export class Aws implements AwsApiCalls {
     return this._ddbClient;
   }
 
-  async getParameter(
-    input: GetParameterCommandInput,
-  ): Promise<GetParameterCommandOutput> {
+  async getParameter(input: GetParameterCommandInput): Promise<GetParameterCommandOutput> {
     return this.ssmClient.send(new GetParameterCommand(input));
   }
 
-  async updateItem(
-    input: UpdateItemCommandInput,
-  ): Promise<UpdateItemCommandOutput> {
+  async updateItem(input: UpdateItemCommandInput): Promise<UpdateItemCommandOutput> {
     return this.ddbClient.send(new UpdateItemCommand(input));
   }
 
-  async getItem(
-    input: GetItemCommandInput,
-  ): Promise<Record<string, any> | undefined> {
+  async getItem(input: GetItemCommandInput): Promise<Record<string, any> | undefined> {
     const response = await this.ddbClient.send(new GetItemCommand(input));
     if (response.Item !== undefined) {
       return this.unmarshall(response.Item);
@@ -222,9 +176,7 @@ export class Aws implements AwsApiCalls {
     }
   }
 
-  async transactWriteItems(
-    input: TransactWriteItemsCommandInput,
-  ): Promise<TransactWriteItemsCommandOutput> {
+  async transactWriteItems(input: TransactWriteItemsCommandInput): Promise<TransactWriteItemsCommandOutput> {
     return this.ddbClient.send(new TransactWriteItemsCommand(input));
   }
 
@@ -236,9 +188,7 @@ export class Aws implements AwsApiCalls {
     return this.ddbClient.send(new QueryCommand(input));
   }
 
-  async scan(
-    input: ScanCommandInput,
-  ): Promise<Record<string, any>[] | undefined> {
+  async scan(input: ScanCommandInput): Promise<Record<string, any>[] | undefined> {
     const response = await this.ddbClient.send(new ScanCommand(input));
     if (response.Items !== undefined && response.Items.length > 0) {
       return response.Items.map((item) => {
@@ -250,11 +200,7 @@ export class Aws implements AwsApiCalls {
     }
   }
 
-  paginateScan(
-    config: PaginationConfig,
-    input: ScanCommandInput,
-    ...additionalArguments: any
-  ): Paginator<ScanCommandOutput> {
+  paginateScan(config: PaginationConfig, input: ScanCommandInput, ...additionalArguments: any): Paginator<ScanCommandOutput> {
     return paginateScan(
       {
         client: this.ddbClient,
@@ -267,57 +213,31 @@ export class Aws implements AwsApiCalls {
     );
   }
 
-  async adminCreateUser(
-    input: AdminCreateUserCommandInput,
-  ): Promise<AdminCreateUserCommandOutput> {
-    return this.cognitoIdentityProviderClient.send(
-      new AdminCreateUserCommand(input),
-    );
+  async adminCreateUser(input: AdminCreateUserCommandInput): Promise<AdminCreateUserCommandOutput> {
+    return this.cognitoIdentityProviderClient.send(new AdminCreateUserCommand(input));
   }
 
-  async adminGetUser(
-    input: AdminGetUserCommandInput,
-  ): Promise<AdminGetUserCommandOutput> {
-    return this.cognitoIdentityProviderClient.send(
-      new AdminGetUserCommand(input),
-    );
+  async adminGetUser(input: AdminGetUserCommandInput): Promise<AdminGetUserCommandOutput> {
+    return this.cognitoIdentityProviderClient.send(new AdminGetUserCommand(input));
   }
 
-  async adminUpdateUserAttributes(
-    input: AdminUpdateUserAttributesCommandInput,
-  ): Promise<AdminUpdateUserAttributesCommandOutput> {
-    return this.cognitoIdentityProviderClient.send(
-      new AdminUpdateUserAttributesCommand(input),
-    );
+  async adminUpdateUserAttributes(input: AdminUpdateUserAttributesCommandInput): Promise<AdminUpdateUserAttributesCommandOutput> {
+    return this.cognitoIdentityProviderClient.send(new AdminUpdateUserAttributesCommand(input));
   }
 
-  async describeIdentityProvider(
-    input: DescribeIdentityProviderCommandInput,
-  ): Promise<DescribeIdentityProviderCommandOutput> {
-    return this.cognitoIdentityProviderClient.send(
-      new DescribeIdentityProviderCommand(input),
-    );
+  async describeIdentityProvider(input: DescribeIdentityProviderCommandInput): Promise<DescribeIdentityProviderCommandOutput> {
+    return this.cognitoIdentityProviderClient.send(new DescribeIdentityProviderCommand(input));
   }
 
-  async describeUserPoolClient(
-    input: DescribeUserPoolClientCommandInput,
-  ): Promise<DescribeUserPoolClientCommandOutput> {
-    return this.cognitoIdentityProviderClient.send(
-      new DescribeUserPoolClientCommand(input),
-    );
+  async describeUserPoolClient(input: DescribeUserPoolClientCommandInput): Promise<DescribeUserPoolClientCommandOutput> {
+    return this.cognitoIdentityProviderClient.send(new DescribeUserPoolClientCommand(input));
   }
 
-  async listUserPoolClients(
-    input: ListUserPoolClientsCommandInput,
-  ): Promise<ListUserPoolClientsCommandOutput> {
-    return this.cognitoIdentityProviderClient.send(
-      new ListUserPoolClientsCommand(input),
-    );
+  async listUserPoolClients(input: ListUserPoolClientsCommandInput): Promise<ListUserPoolClientsCommandOutput> {
+    return this.cognitoIdentityProviderClient.send(new ListUserPoolClientsCommand(input));
   }
 
-  paginateListUserPoolClients(
-    input: ListUserPoolClientsCommandInput,
-  ): Paginator<ListUserPoolClientsCommandOutput> {
+  paginateListUserPoolClients(input: ListUserPoolClientsCommandInput): Paginator<ListUserPoolClientsCommandOutput> {
     return paginateListUserPoolClients(
       {
         client: this.cognitoIdentityProviderClient,
@@ -326,32 +246,22 @@ export class Aws implements AwsApiCalls {
     );
   }
 
-  async findUserPoolClient(
-    clientName: string,
-    userPoolId: string,
-  ): Promise<UserPoolClientType | undefined> {
+  async findUserPoolClient(clientName: string, userPoolId: string): Promise<UserPoolClientType | undefined> {
     let result: UserPoolClientType | undefined;
 
     for await (const page of this.paginateListUserPoolClients({
       UserPoolId: userPoolId,
     })) {
-      if (
-        page.UserPoolClients != undefined &&
-        page.UserPoolClients.length > 0
-      ) {
+      if (page.UserPoolClients != undefined && page.UserPoolClients.length > 0) {
         for (const client of page.UserPoolClients) {
           if (client.ClientName == clientName) {
-            const describeUserPoolClientResponse =
-              await this.describeUserPoolClient({
-                ClientId: client.ClientId,
-                UserPoolId: userPoolId,
-              });
-            const userPoolClient =
-              describeUserPoolClientResponse.UserPoolClient;
+            const describeUserPoolClientResponse = await this.describeUserPoolClient({
+              ClientId: client.ClientId,
+              UserPoolId: userPoolId,
+            });
+            const userPoolClient = describeUserPoolClientResponse.UserPoolClient;
             if (userPoolClient != undefined) {
-              this._powertools?.logger.info(
-                `Found App Client ${userPoolClient.ClientName} details`,
-              );
+              this._powertools?.logger.info(`Found App Client ${userPoolClient.ClientName} details`);
               result = userPoolClient;
             }
           }
@@ -363,8 +273,7 @@ export class Aws implements AwsApiCalls {
 
   generateRandomString(len: number): string {
     let result = "";
-    const characters =
-      "ABCDEFGHIJKLMNPQRSTUVWXYZabcdefghijklmnpqrstuvwxyz123456789!#^_-+=~?";
+    const characters = "ABCDEFGHIJKLMNPQRSTUVWXYZabcdefghijklmnpqrstuvwxyz123456789!#^_-+=~?";
     const charactersLength = characters.length;
     let counter = 0;
     while (counter < len) {

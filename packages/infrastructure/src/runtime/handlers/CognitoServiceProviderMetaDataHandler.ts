@@ -1,14 +1,6 @@
 import { Callback, Context } from "aws-lambda";
-import {
-  APIGatewayProxyEventV2,
-  APIGatewayProxyResultV2,
-} from "aws-lambda/trigger/api-gateway-proxy";
-import {
-  APIGatewayProxyLambdaHandler,
-  Aws,
-  BasicLambdaTools,
-  Powertools,
-} from "../utils/";
+import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from "aws-lambda/trigger/api-gateway-proxy";
+import { APIGatewayProxyLambdaHandler, Aws, BasicLambdaTools, Powertools } from "../utils/";
 
 const powertools = new Powertools({
   serviceName: "CognitoServiceProviderMetaDataHandler",
@@ -22,9 +14,7 @@ const powertools = new Powertools({
  * @param _callback
  * @param tools
  */
-export const onEventHandler: APIGatewayProxyLambdaHandler<
-  Record<string, string>
-> = async (
+export const onEventHandler: APIGatewayProxyLambdaHandler<Record<string, string>> = async (
   event: APIGatewayProxyEventV2,
   _context: Context,
   _callback: Callback<APIGatewayProxyResultV2<Record<string, any>>>,

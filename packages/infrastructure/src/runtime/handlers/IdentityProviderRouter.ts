@@ -1,12 +1,7 @@
 import { Logger } from "@aws-lambda-powertools/logger";
 import { APIGatewayProxyEvent, Callback, Context } from "aws-lambda";
 import { APIGatewayProxyResult } from "aws-lambda/trigger/api-gateway-proxy";
-import {
-  APIGatewayProxyLambdaHandler,
-  Aws,
-  BasicLambdaTools,
-  Powertools,
-} from "../utils/";
+import { APIGatewayProxyLambdaHandler, Aws, BasicLambdaTools, Powertools } from "../utils/";
 
 const powertools = new Powertools({
   serviceName: "IdentityProviderRouter",
@@ -50,55 +45,29 @@ export const onEventHandler: APIGatewayProxyLambdaHandler = async (
     const providerName = `@${email.split("@")[1]}`;
     logger.info(`Looking for Idp for ${providerName}`);
     try {
-      const describeIdentityProviderResponse =
-        await tools.aws.describeIdentityProvider({
-          ProviderName: providerName,
-          UserPoolId: process.env.USER_POOL_ID!,
-        });
+      const describeIdentityProviderResponse = await tools.aws.describeIdentityProvider({
+        ProviderName: providerName,
+        UserPoolId: process.env.USER_POOL_ID!,
+      });
       if (describeIdentityProviderResponse.IdentityProvider != undefined) {
-        logger.info(
-          `Found Idp ${describeIdentityProviderResponse.IdentityProvider?.ProviderName}`,
-        );
+        logger.info(`Found Idp ${describeIdentityProviderResponse.IdentityProvider?.ProviderName}`);
 
         try {
-          const userPoolClient = await tools.aws.findUserPoolClient(
-            `${providerName}-authorization-code-client`,
-            process.env.USER_POOL_ID!,
-          );
+          const userPoolClient = await tools.aws.findUserPoolClient(`${providerName}-authorization-code-client`, process.env.USER_POOL_ID!);
 
-          if (
-            userPoolClient != undefined &&
-            userPoolClient.CallbackURLs != undefined
-          ) {
-            logger.info(
-              `Found App Client ${userPoolClient.ClientName} details`,
-            );
+          if (userPoolClient != undefined && userPoolClient.CallbackURLs != undefined) {
+            logger.info(`Found App Client ${userPoolClient.ClientName} details`);
             const callbackUrl = userPoolClient.CallbackURLs[0];
             const clientId = userPoolClient.ClientId!;
             const scope = "openid+email";
-            response = redirectToLogin(
-              providerName,
-              clientId,
-              scope,
-              callbackUrl,
-              returnApplicationJson,
-              logger,
-            );
+            response = redirectToLogin(providerName, clientId, scope, callbackUrl, returnApplicationJson, logger);
           } else {
-            response = noAppClientFound(
-              providerName,
-              returnApplicationJson,
-              logger,
-            );
+            response = noAppClientFound(providerName, returnApplicationJson, logger);
           }
         } catch (e) {
           const error = e as Error;
           if (error.name == "ResourceNotFoundException") {
-            response = noAppClientFound(
-              providerName,
-              returnApplicationJson,
-              logger,
-            );
+            response = noAppClientFound(providerName, returnApplicationJson, logger);
           } else {
             response = errorResponse(error, returnApplicationJson, logger);
           }
@@ -121,11 +90,7 @@ export const onEventHandler: APIGatewayProxyLambdaHandler = async (
   return response;
 };
 
-function errorResponse(
-  error: Error,
-  returnApplicationJson: boolean,
-  logger: Logger,
-): APIGatewayProxyResult {
+function errorResponse(error: Error, returnApplicationJson: boolean, logger: Logger): APIGatewayProxyResult {
   logger.error(`${error.name} - ${error.message}`);
   if (returnApplicationJson) {
     return {
@@ -145,14 +110,7 @@ function errorResponse(
   }
 }
 
-function redirectToLogin(
-  providerName: string,
-  clientId: string,
-  scope: string,
-  callbackUrl: string,
-  returnApplicationJson: boolean,
-  logger: Logger,
-): APIGatewayProxyResult {
+function redirectToLogin(providerName: string, clientId: string, scope: string, callbackUrl: string, returnApplicationJson: boolean, logger: Logger): APIGatewayProxyResult {
   const state = btoa(
     JSON.stringify({
       providerName: providerName,
@@ -184,11 +142,7 @@ function redirectToLogin(
   }
 }
 
-function noAppClientFound(
-  providerName: string,
-  returnApplicationJson: boolean,
-  logger: Logger,
-): APIGatewayProxyResult {
+function noAppClientFound(providerName: string, returnApplicationJson: boolean, logger: Logger): APIGatewayProxyResult {
   logger.warn(`No app client found for ${providerName}`);
   if (returnApplicationJson) {
     return {
@@ -213,11 +167,7 @@ function noAppClientFound(
   }
 }
 
-function noIdpFound(
-  providerName: string,
-  returnApplicationJson: boolean,
-  logger: Logger,
-): APIGatewayProxyResult {
+function noIdpFound(providerName: string, returnApplicationJson: boolean, logger: Logger): APIGatewayProxyResult {
   logger.warn(`No Idp found for ${providerName}`);
   if (returnApplicationJson) {
     return {
@@ -242,10 +192,7 @@ function noIdpFound(
   }
 }
 
-function noEmailResponse(
-  returnApplicationJson: boolean,
-  logger: Logger,
-): APIGatewayProxyResult {
+function noEmailResponse(returnApplicationJson: boolean, logger: Logger): APIGatewayProxyResult {
   logger.warn("Invalid email");
   if (returnApplicationJson) {
     return {

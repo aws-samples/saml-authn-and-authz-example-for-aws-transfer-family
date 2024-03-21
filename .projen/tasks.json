@@ -155,6 +155,15 @@
       "name": "pre-compile",
       "description": "Prepare the project for compilation"
     },
+    "prettier": {
+      "name": "prettier",
+      "steps": [
+        {
+          "exec": "nx prettier @aws-transfer-family-with-saml/infrastructure",
+          "receiveArgs": true
+        }
+      ]
+    },
     "test": {
       "name": "test",
       "description": "Run tests"
@@ -167,13 +176,13 @@
       },
       "steps": [
         {
-          "exec": "pnpm dlx npm-check-updates@16 --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@npmcli/arborist,@types/npm-packlist,@types/npmcli__arborist,projen,ts-node,typescript"
+          "exec": "pnpm dlx npm-check-updates@16 --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@npmcli/arborist,@types/npm-packlist,@types/npmcli__arborist,prettier,projen,ts-node,typescript"
         },
         {
           "exec": "pnpm i --no-frozen-lockfile"
         },
         {
-          "exec": "pnpm update @npmcli/arborist @nrwl/devkit @nrwl/workspace @types/node @types/npm-packlist @types/npmcli__arborist constructs nx projen ts-node typescript"
+          "exec": "pnpm update @npmcli/arborist @nrwl/devkit @nrwl/workspace @types/node @types/npm-packlist @types/npmcli__arborist constructs nx prettier projen ts-node typescript"
         },
         {
           "exec": "pnpm dlx projen"

@@ -78,8 +78,11 @@
       "description": "Runs eslint against the codebase",
       "steps": [
         {
-          "exec": "eslint --ext .ts,.tsx --fix --no-error-on-unmatched-pattern $@ src/runtime src/infrastructure test",
+          "exec": "eslint --ext .ts,.tsx --fix --no-error-on-unmatched-pattern $@ src/runtime test",
           "receiveArgs": true
+        },
+        {
+          "spawn": "prettier"
         }
       ]
     },
@@ -122,6 +125,15 @@
       "name": "pre-compile",
       "description": "Prepare the project for compilation"
     },
+    "prettier": {
+      "name": "prettier",
+      "steps": [
+        {
+          "exec": "prettier  --config /Users/awsgalen/IdeaProjects/aws-transfer-family-with-saml/.prettierrc.json --no-error-on-unmatched-pattern --write 'src/**/*.{ts,js,json,jsx}' 'src/*.{ts,js,json,jsx}'",
+          "receiveArgs": true
+        }
+      ]
+    },
     "synth": {
       "name": "synth",
       "description": "Synthesizes your cdk app into cdk.out",
@@ -157,13 +169,13 @@
       },
       "steps": [
         {
-          "exec": "pnpm dlx npm-check-updates@16 --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@types/sinon,aws-cdk-lib,cdk-assets,cdk-nag,esbuild,eslint-config-prettier,eslint-import-resolver-typescript,eslint-plugin-import,eslint-plugin-prettier,prettier,projen,sinon,ts-node,typescript,vitest,@aws-crypto/sha256-js,@aws-lambda-powertools/logger,@aws-lambda-powertools/metrics,@aws-lambda-powertools/tracer,@aws-sdk/client-cognito-identity-provider,@aws-sdk/client-dynamodb,@aws-sdk/client-ssm,@aws-sdk/types,@aws-sdk/util-dynamodb,@middy/core,@smithy/node-http-handler,@smithy/protocol-http,@smithy/signature-v4,@smithy/types,@types/aws-lambda,aws-jwt-verify,aws-xray-sdk,jwt-decode"
+          "exec": "pnpm dlx npm-check-updates@16 --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@types/sinon,aws-cdk-lib,cdk-assets,cdk-nag,esbuild,eslint-import-resolver-typescript,eslint-plugin-import,projen,sinon,ts-node,typescript,vitest,@aws-crypto/sha256-js,@aws-lambda-powertools/logger,@aws-lambda-powertools/metrics,@aws-lambda-powertools/tracer,@aws-sdk/client-cognito-identity-provider,@aws-sdk/client-dynamodb,@aws-sdk/client-ssm,@aws-sdk/types,@aws-sdk/util-dynamodb,@middy/core,@smithy/node-http-handler,@smithy/protocol-http,@smithy/signature-v4,@smithy/types,@types/aws-lambda,aws-jwt-verify,aws-xray-sdk,jwt-decode"
         },
         {
           "exec": "pnpm i --no-frozen-lockfile"
         },
         {
-          "exec": "pnpm update @types/node @types/sinon @typescript-eslint/eslint-plugin @typescript-eslint/parser aws-cdk-lib aws-cdk cdk-assets cdk-nag esbuild eslint-config-prettier eslint-import-resolver-typescript eslint-plugin-import eslint-plugin-prettier eslint prettier projen sinon ts-node typescript vitest @aws-crypto/sha256-js @aws-lambda-powertools/logger @aws-lambda-powertools/metrics @aws-lambda-powertools/tracer @aws-sdk/client-cognito-identity-provider @aws-sdk/client-dynamodb @aws-sdk/client-ssm @aws-sdk/types @aws-sdk/util-dynamodb @middy/core @smithy/node-http-handler @smithy/protocol-http @smithy/signature-v4 @smithy/types @types/aws-lambda aws-jwt-verify aws-xray-sdk constructs jwt-decode"
+          "exec": "pnpm update @types/node @types/sinon @typescript-eslint/eslint-plugin @typescript-eslint/parser aws-cdk-lib aws-cdk cdk-assets cdk-nag esbuild eslint-import-resolver-typescript eslint-plugin-import eslint projen sinon ts-node typescript vitest @aws-crypto/sha256-js @aws-lambda-powertools/logger @aws-lambda-powertools/metrics @aws-lambda-powertools/tracer @aws-sdk/client-cognito-identity-provider @aws-sdk/client-dynamodb @aws-sdk/client-ssm @aws-sdk/types @aws-sdk/util-dynamodb @middy/core @smithy/node-http-handler @smithy/protocol-http @smithy/signature-v4 @smithy/types @types/aws-lambda aws-jwt-verify aws-xray-sdk constructs jwt-decode"
         },
         {
           "exec": "pnpm dlx projen"
@@ -220,6 +232,12 @@
         },
         {
           "exec": "cp -R /Users/awsgalen/IdeaProjects/aws-transfer-family-with-saml/packages/infrastructure/node_modules/aws-xray-sdk/* /tmp/infrastructure/nodejs/node_modules/aws-xray-sdk"
+        },
+        {
+          "exec": "mkdir -p /tmp/infrastructure/nodejs/node_modules/jwt-decode"
+        },
+        {
+          "exec": "cp -R /Users/awsgalen/IdeaProjects/aws-transfer-family-with-saml/packages/infrastructure/node_modules/jwt-decode/* /tmp/infrastructure/nodejs/node_modules/jwt-decode"
         },
         {
           "exec": "rm -Rf ./lib/runtime",
