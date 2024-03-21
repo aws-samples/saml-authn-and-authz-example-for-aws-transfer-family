@@ -95,17 +95,23 @@ function errorResponse(error: Error, returnApplicationJson: boolean, logger: Log
   if (returnApplicationJson) {
     return {
       headers: {
+        "Cache-Control": "no-cache",
         "Content-Type": "application/json",
       },
       isBase64Encoded: false,
       statusCode: 500,
-      body: JSON.stringify(error),
+      body: JSON.stringify({
+        error: {
+          name: error.name,
+          message: error.message,
+        },
+      }),
     };
   } else {
     return {
       isBase64Encoded: false,
       statusCode: 500,
-      body: `${error.name} - ${error.message}: ${error.stack}`,
+      body: `${error.name} - ${error.message}`,
     };
   }
 }
@@ -116,15 +122,16 @@ function redirectToLogin(providerName: string, clientId: string, scope: string, 
       providerName: providerName,
     }),
   );
-  const location = `${process.env.COGNITO_URL}/oauth2/authorize?response_type=code&client_id=${clientId}&scope=${scope}&redirect_uri=${callbackUrl}&state=${state}`;
+  const location = `${process.env.COGNITO_URL}/oauth2/authorize?identity_provider=${providerName}&response_type=code&client_id=${clientId}&scope=${scope}&redirect_uri=${callbackUrl}&state=${state}`;
   logger.info(`Redirecting to login for ${providerName}: ${location}`);
   if (returnApplicationJson) {
     return {
       headers: {
+        "Cache-Control": "no-cache",
         "Content-Type": "application/json",
       },
       isBase64Encoded: false,
-      statusCode: 301,
+      statusCode: 302,
       body: JSON.stringify({
         location: location,
       }),
@@ -132,9 +139,10 @@ function redirectToLogin(providerName: string, clientId: string, scope: string, 
   } else {
     return {
       isBase64Encoded: false,
-      statusCode: 301,
+      statusCode: 302,
       body: "Redirecting to login for " + providerName,
       headers: {
+        "Cache-Control": "no-cache",
         "Content-Type": "text/html",
         Location: location,
       },
@@ -147,6 +155,7 @@ function noAppClientFound(providerName: string, returnApplicationJson: boolean, 
   if (returnApplicationJson) {
     return {
       headers: {
+        "Cache-Control": "no-cache",
         "Content-Type": "application/json",
       },
       isBase64Encoded: false,
@@ -158,6 +167,7 @@ function noAppClientFound(providerName: string, returnApplicationJson: boolean, 
   } else {
     return {
       headers: {
+        "Cache-Control": "no-cache",
         "Content-Type": "text/html",
       },
       isBase64Encoded: false,
@@ -172,6 +182,7 @@ function noIdpFound(providerName: string, returnApplicationJson: boolean, logger
   if (returnApplicationJson) {
     return {
       headers: {
+        "Cache-Control": "no-cache",
         "Content-Type": "application/json",
       },
       isBase64Encoded: false,
@@ -183,6 +194,7 @@ function noIdpFound(providerName: string, returnApplicationJson: boolean, logger
   } else {
     return {
       headers: {
+        "Cache-Control": "no-cache",
         "Content-Type": "text/html",
       },
       isBase64Encoded: false,
@@ -197,6 +209,7 @@ function noEmailResponse(returnApplicationJson: boolean, logger: Logger): APIGat
   if (returnApplicationJson) {
     return {
       headers: {
+        "Cache-Control": "no-cache",
         "Content-Type": "application/json",
       },
       isBase64Encoded: false,
@@ -208,6 +221,7 @@ function noEmailResponse(returnApplicationJson: boolean, logger: Logger): APIGat
   } else {
     return {
       headers: {
+        "Cache-Control": "no-cache",
         "Content-Type": "text/html",
       },
       isBase64Encoded: false,
