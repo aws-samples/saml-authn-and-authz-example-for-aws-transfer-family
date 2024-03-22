@@ -24,7 +24,7 @@ import { safeName } from "../../index";
 import { APIGatewayProxyLambdaHandlerWithJwtVerifier, Aws, LambdaToolsWithJwtVerifier, Powertools, SimpleJwksCacheSingleton } from "../utils/";
 
 const powertools = new Powertools({
-  serviceName: "ATFServerIdentityProvider"
+  serviceName: "ATFServerIdentityProvider",
 });
 
 const READ_PERMISSIONS = ["s3:GetObject", "s3:GetObjectVersion", "s3:GetObjectACL"];
@@ -58,13 +58,13 @@ export const onEventHandler: APIGatewayProxyLambdaHandlerWithJwtVerifier<any> = 
     powertools,
     verifier: CognitoJwtVerifier.create(
       {
-        userPoolId: process.env.USER_POOL_ID!
+        userPoolId: process.env.USER_POOL_ID!,
       },
       {
-        jwksCache: SimpleJwksCacheSingleton.instance()
-      }
-    )
-  }
+        jwksCache: SimpleJwksCacheSingleton.instance(),
+      },
+    ),
+  },
 ): Promise<APIGatewayProxyResult> => {
   // const {aws} = tools;
   let response: Response | undefined = undefined;
@@ -83,14 +83,14 @@ export const onEventHandler: APIGatewayProxyLambdaHandlerWithJwtVerifier<any> = 
     const auth = await tools.aws.getItem({
       TableName: process.env.TABLE_NAME!,
       Key: marshall({
-        pk: username
-      })
+        pk: username,
+      }),
     });
     if (auth?.password === password) {
       //check the access token
       await tools.verifier.verify(auth.accessToken, {
         tokenUse: "access",
-        clientId: auth.userPoolClientId
+        clientId: auth.userPoolClientId,
       });
       logger.info(`Authenticated user ${username}`);
       const userInfo = auth.userInfo;
@@ -114,23 +114,23 @@ export const onEventHandler: APIGatewayProxyLambdaHandlerWithJwtVerifier<any> = 
             Action: ["s3:ListBucket"],
             Effect: "Allow",
             Resource: [`arn:aws:s3:::${bucketName}`],
-            Condition: homeDirCondition(homeDir, permissions)
+            Condition: homeDirCondition(homeDir, permissions),
           },
           {
             Sid: "HomeDirObjectAccess",
             Effect: "Allow",
             Action: permissionToActions(homeDir, logger),
-            Resource: homeDirResource(bucketName, homeDir)
+            Resource: homeDirResource(bucketName, homeDir),
           },
-          ...permissionsToPolicyStatments(bucketName, permissions, logger)
-        ]
+          ...permissionsToPolicyStatments(bucketName, permissions, logger),
+        ],
       };
       const homeEntry = `/${cleanDir(homeDir.dir)}`;
       let homeDirectoryDetails = [
         {
           Entry: homeEntry,
-          Target: `/${bucketName}/${cleanDir(homeDir.dir)}`
-        }
+          Target: `/${bucketName}/${cleanDir(homeDir.dir)}`,
+        },
       ];
       /*
       You can't have overlapping paths
@@ -140,7 +140,7 @@ export const onEventHandler: APIGatewayProxyLambdaHandlerWithJwtVerifier<any> = 
         permissions.forEach((permission) => {
           homeDirectoryDetails.push({
             Entry: `/${cleanDir(permission.dir)}`,
-            Target: `/${bucketName}/${cleanDir(permission.dir)}`
+            Target: `/${bucketName}/${cleanDir(permission.dir)}`,
           });
         });
       }
@@ -155,7 +155,7 @@ export const onEventHandler: APIGatewayProxyLambdaHandlerWithJwtVerifier<any> = 
         Role: roleArn,
         HomeDirectoryType: HomeDirectoryType.LOGICAL,
         HomeDirectoryDetails: JSON.stringify(homeDirectoryDetails),
-        Policy: JSON.stringify(sessionPolicy)
+        Policy: JSON.stringify(sessionPolicy),
       };
     } else {
       logger.error(`Invalid password for ${username}`);
@@ -168,7 +168,7 @@ export const onEventHandler: APIGatewayProxyLambdaHandlerWithJwtVerifier<any> = 
   logger.info(`Sending response: ${body}`);
   return {
     statusCode: 200,
-    body: body
+    body: body,
   };
 };
 
@@ -186,14 +186,14 @@ function permissionToActions(directoryPermission: DirectoryPermission, logger: L
   const permissions = parsePermissions(directoryPermission, logger);
   permissions.map((value) => {
     switch (value) {
-    case "r":
-      actions.push(...READ_PERMISSIONS);
-      break;
-    case "w":
-      actions.push(...WRITE_PERMISSIONS);
-      break;
-    default:
-      logger.warn(`Invalid directory permissions specified for ${directoryPermission.dir}`);
+      case "r":
+        actions.push(...READ_PERMISSIONS);
+        break;
+      case "w":
+        actions.push(...WRITE_PERMISSIONS);
+        break;
+      default:
+        logger.warn(`Invalid directory permissions specified for ${directoryPermission.dir}`);
     }
   });
   return actions;
@@ -206,10 +206,10 @@ function homeDirCondition(homeDir: DirectoryPermission, permissions: DirectoryPe
   const homeEntry = `/${cleanDir(homeDir.dir)}`;
   return homeEntry != "/"
     ? {
-      StringLike: {
-        "s3:prefix": permissionsToPrefixes([homeDir, ...permissions])
+        StringLike: {
+          "s3:prefix": permissionsToPrefixes([homeDir, ...permissions]),
+        },
       }
-    }
     : undefined;
 }
 
@@ -258,7 +258,7 @@ function permissionToPolicyStatment(bucketName: string, directoryPermission: Dir
   return {
     Effect: "Allow",
     Action: permissionToActions(directoryPermission, logger),
-    Resource: `arn:aws:s3:::${bucketName}/${cleanDir(directoryPermission.dir)}/*`
+    Resource: `arn:aws:s3:::${bucketName}/${cleanDir(directoryPermission.dir)}/*`,
   };
 }
 

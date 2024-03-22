@@ -17,7 +17,7 @@
 
 import { Aws, RemovalPolicy } from "aws-cdk-lib";
 import { AttributeMapping, UserPoolIdentityProviderSaml, UserPoolIdentityProviderSamlMetadataType } from "aws-cdk-lib/aws-cognito";
-import { AttributeType, TableV2 } from "aws-cdk-lib/aws-dynamodb";
+import { AttributeType, Billing, TableEncryptionV2, TableV2 } from "aws-cdk-lib/aws-dynamodb";
 import { Effect, PolicyDocument, PolicyStatement, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import { LogGroup, RetentionDays } from "aws-cdk-lib/aws-logs";
 import { BlockPublicAccess, Bucket, IBucket } from "aws-cdk-lib/aws-s3";
@@ -66,6 +66,9 @@ export class ATFServerWithSaml extends Construct {
         type: AttributeType.STRING,
         name: "pk",
       },
+      encryption: TableEncryptionV2.awsManagedKey(),
+      billing: Billing.onDemand(),
+      deletionProtection: false,
     });
     this.lambdas = new Lambdas(this, "Lambdas", {
       layers,

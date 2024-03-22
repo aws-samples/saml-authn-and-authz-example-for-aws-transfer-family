@@ -104,5 +104,11 @@ export class TransferFamilyWithSamlStack extends Stack {
         reason: "Auth router endpoint needs to be public",
       },
     ]);
+    NagSuppressions.addResourceSuppressionsByPath(this, `/${this.stackName}/ATFServerWithSaml/AccessLogsBucket/Resource`, [
+      {
+        id: "AwsSolutions-S1",
+        reason: "This bucket is the access log bucket",
+      },
+    ]);
   }
 }
