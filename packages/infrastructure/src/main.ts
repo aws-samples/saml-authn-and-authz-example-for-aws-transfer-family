@@ -1,5 +1,4 @@
 import { App, Aspects } from "aws-cdk-lib";
-import { ProviderAttribute } from "aws-cdk-lib/aws-cognito";
 import { AwsSolutionsChecks } from "cdk-nag";
 import { TransferFamilyWithSamlStack } from "./stacks/TransferFamilyWithSamlStack";
 
@@ -14,9 +13,12 @@ const app = new App();
 new TransferFamilyWithSamlStack(app, "aws-transfer-family-with-saml", {
   env: devEnv,
   samlIdps: [
+    //Add the configurations for your SAML IdPs here
+    /*
+
     {
       name: "@institution01.edu",
-      metadataUrl: "https://saml.institution01.awsgalen.com/simplesaml/module.php/saml/idp/metadata",
+      metadataUrl: "https://<YOUR_SAML_IDP>/simplesaml/module.php/saml/idp/metadata",
       attributeMap: {
         email: ProviderAttribute.other("mail"),
         givenName: ProviderAttribute.other("givenName"),
@@ -30,7 +32,7 @@ new TransferFamilyWithSamlStack(app, "aws-transfer-family-with-saml", {
     },
     {
       name: "@institution02.edu",
-      metadataUrl: "https://saml.institution02.awsgalen.com/simplesaml/module.php/saml/idp/metadata",
+      metadataUrl: "https://<YOUR_SAML_IDP>/simplesaml/module.php/saml/idp/metadata",
       attributeMap: {
         email: ProviderAttribute.other("mail"),
         givenName: ProviderAttribute.other("givenName"),
@@ -42,6 +44,8 @@ new TransferFamilyWithSamlStack(app, "aws-transfer-family-with-saml", {
         },
       },
     },
+
+    */
   ],
 });
 
