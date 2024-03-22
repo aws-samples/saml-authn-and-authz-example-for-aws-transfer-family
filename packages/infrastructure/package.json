@@ -1,5 +1,5 @@
 {
-  "name": "@saml-authentication-example-for-aws-transfer-family/infrastructure",
+  "name": "@saml-authn-and-authz-example-for-aws-transfer-family/infrastructure",
   "scripts": {
     "build": "pnpm dlx projen build",
     "bundle": "pnpm dlx projen bundle",

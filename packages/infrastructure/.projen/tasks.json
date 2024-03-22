@@ -129,7 +129,7 @@
       "name": "prettier",
       "steps": [
         {
-          "exec": "prettier  --config /Users/awsgalen/IdeaProjects/saml-authentication-example-for-aws-transfer-family/.prettierrc.json --no-error-on-unmatched-pattern --write 'src/**/*.{ts,js,json,jsx}' 'src/*.{ts,js,json,jsx}'",
+          "exec": "prettier  --config /Users/awsgalen/IdeaProjects/saml-authn-and-authz-example-for-aws-transfer-family/.prettierrc.json --no-error-on-unmatched-pattern --write 'src/**/*.{ts,js,json,jsx}' 'src/*.{ts,js,json,jsx}'",
           "receiveArgs": true
         }
       ]
@@ -207,45 +207,45 @@
           "exec": "rm -Rf /tmp/infrastructure"
         },
         {
-          "exec": "mkdir -p /tmp/infrastructure/nodejs/node_modules/@saml-authentication-example-for-aws-transfer-family/infrastructure"
+          "exec": "mkdir -p /tmp/infrastructure/nodejs/node_modules/@saml-authn-and-authz-example-for-aws-transfer-family/infrastructure"
         },
         {
           "exec": "mkdir -p /tmp/infrastructure/nodejs/node_modules/@aws-crypto/sha256-js"
         },
         {
-          "exec": "cp -R /Users/awsgalen/IdeaProjects/saml-authentication-example-for-aws-transfer-family/packages/infrastructure/node_modules/@aws-crypto/sha256-js/* /tmp/infrastructure/nodejs/node_modules/@aws-crypto/sha256-js"
+          "exec": "cp -R /Users/awsgalen/IdeaProjects/saml-authn-and-authz-example-for-aws-transfer-family/packages/infrastructure/node_modules/@aws-crypto/sha256-js/* /tmp/infrastructure/nodejs/node_modules/@aws-crypto/sha256-js"
         },
         {
           "exec": "mkdir -p /tmp/infrastructure/nodejs/node_modules/@middy/core"
         },
         {
-          "exec": "cp -R /Users/awsgalen/IdeaProjects/saml-authentication-example-for-aws-transfer-family/packages/infrastructure/node_modules/@middy/core/* /tmp/infrastructure/nodejs/node_modules/@middy/core"
+          "exec": "cp -R /Users/awsgalen/IdeaProjects/saml-authn-and-authz-example-for-aws-transfer-family/packages/infrastructure/node_modules/@middy/core/* /tmp/infrastructure/nodejs/node_modules/@middy/core"
         },
         {
           "exec": "mkdir -p /tmp/infrastructure/nodejs/node_modules/aws-jwt-verify"
         },
         {
-          "exec": "cp -R /Users/awsgalen/IdeaProjects/saml-authentication-example-for-aws-transfer-family/packages/infrastructure/node_modules/aws-jwt-verify/* /tmp/infrastructure/nodejs/node_modules/aws-jwt-verify"
+          "exec": "cp -R /Users/awsgalen/IdeaProjects/saml-authn-and-authz-example-for-aws-transfer-family/packages/infrastructure/node_modules/aws-jwt-verify/* /tmp/infrastructure/nodejs/node_modules/aws-jwt-verify"
         },
         {
           "exec": "mkdir -p /tmp/infrastructure/nodejs/node_modules/aws-xray-sdk"
         },
         {
-          "exec": "cp -R /Users/awsgalen/IdeaProjects/saml-authentication-example-for-aws-transfer-family/packages/infrastructure/node_modules/aws-xray-sdk/* /tmp/infrastructure/nodejs/node_modules/aws-xray-sdk"
+          "exec": "cp -R /Users/awsgalen/IdeaProjects/saml-authn-and-authz-example-for-aws-transfer-family/packages/infrastructure/node_modules/aws-xray-sdk/* /tmp/infrastructure/nodejs/node_modules/aws-xray-sdk"
         },
         {
           "exec": "mkdir -p /tmp/infrastructure/nodejs/node_modules/jwt-decode"
         },
         {
-          "exec": "cp -R /Users/awsgalen/IdeaProjects/saml-authentication-example-for-aws-transfer-family/packages/infrastructure/node_modules/jwt-decode/* /tmp/infrastructure/nodejs/node_modules/jwt-decode"
+          "exec": "cp -R /Users/awsgalen/IdeaProjects/saml-authn-and-authz-example-for-aws-transfer-family/packages/infrastructure/node_modules/jwt-decode/* /tmp/infrastructure/nodejs/node_modules/jwt-decode"
         },
         {
           "exec": "rm -Rf ./lib/runtime",
-          "cwd": "/Users/awsgalen/IdeaProjects/saml-authentication-example-for-aws-transfer-family/packages/infrastructure"
+          "cwd": "/Users/awsgalen/IdeaProjects/saml-authn-and-authz-example-for-aws-transfer-family/packages/infrastructure"
         },
         {
           "exec": "mkdir ./dist",
-          "cwd": "/Users/awsgalen/IdeaProjects/saml-authentication-example-for-aws-transfer-family/packages/infrastructure"
+          "cwd": "/Users/awsgalen/IdeaProjects/saml-authn-and-authz-example-for-aws-transfer-family/packages/infrastructure"
         },
         {
           "exec": "esbuild src/runtime/handlers/ATFServerIdentityProvider.ts --platform=node  --bundle  --external:@aws-sdk/types --external:@aws-lambda-powertools/logger --external:@aws-lambda-powertools/metrics --external:@aws-lambda-powertools/tracer --external:@aws-sdk/client-cognito-identity-provider --external:@aws-sdk/client-dynamodb --external:@aws-sdk/client-ssm --external:@aws-sdk/util-dynamodb --external:@smithy/node-http-handler --external:@smithy/protocol-http --external:@smithy/signature-v4 --external:@smithy/types --external:@types/aws-lambda --external:constructs  --outfile=lib/runtime/esbuild/ATFServerIdentityProvider/index.js"
@@ -272,11 +272,11 @@
           "exec": "zip -j -r ./dist/IdentityProviderRouter.zip lib/runtime/esbuild/IdentityProviderRouter/index.js"
         },
         {
-          "exec": "zip -r /Users/awsgalen/IdeaProjects/saml-authentication-example-for-aws-transfer-family/packages/infrastructure/dist/lambdas-layer.zip ./nodejs",
+          "exec": "zip -r /Users/awsgalen/IdeaProjects/saml-authn-and-authz-example-for-aws-transfer-family/packages/infrastructure/dist/lambdas-layer.zip ./nodejs",
           "cwd": "/tmp/infrastructure"
         }
       ],
-      "cwd": "/Users/awsgalen/IdeaProjects/saml-authentication-example-for-aws-transfer-family/packages/infrastructure"
+      "cwd": "/Users/awsgalen/IdeaProjects/saml-authn-and-authz-example-for-aws-transfer-family/packages/infrastructure"
     }
   },
   "env": {

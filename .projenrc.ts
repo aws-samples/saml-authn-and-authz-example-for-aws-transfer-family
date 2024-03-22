@@ -18,7 +18,7 @@ const cdkVersion = `${execSync("npm show 'aws-cdk-lib' version")}`.trim();
 const nodeVersion = "20.11.1";
 const pnpmVersion = "8.15.3";
 const jsiiReleaseVersion = "1.94.0";
-const namespace = "@saml-authentication-example-for-aws-transfer-family";
+const namespace = "@saml-authn-and-authz-example-for-aws-transfer-family";
 const main = async () => {
   const root = new TypeScriptProject({
     name: `${namespace}/root`,

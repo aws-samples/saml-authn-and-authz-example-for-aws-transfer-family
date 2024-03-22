@@ -1,5 +1,5 @@
 {
-  "name": "@saml-authentication-example-for-aws-transfer-family/root",
+  "name": "@saml-authn-and-authz-example-for-aws-transfer-family/root",
   "scripts": {
     "build": "pnpm dlx projen build",
     "clobber": "pnpm dlx projen clobber",

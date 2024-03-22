@@ -78,7 +78,7 @@
       "name": "deploy",
       "steps": [
         {
-          "exec": "nx deploy @saml-authentication-example-for-aws-transfer-family/infrastructure",
+          "exec": "nx deploy @saml-authn-and-authz-example-for-aws-transfer-family/infrastructure",
           "receiveArgs": true
         }
       ]
@@ -87,7 +87,7 @@
       "name": "destroy",
       "steps": [
         {
-          "exec": "nx destroy @saml-authentication-example-for-aws-transfer-family/infrastructure",
+          "exec": "nx destroy @saml-authn-and-authz-example-for-aws-transfer-family/infrastructure",
           "receiveArgs": true
         }
       ]
@@ -126,7 +126,7 @@
       "name": "nx",
       "steps": [
         {
-          "exec": "nx build @saml-authentication-example-for-aws-transfer-family/infrastructure",
+          "exec": "nx build @saml-authn-and-authz-example-for-aws-transfer-family/infrastructure",
           "receiveArgs": true
         }
       ]
@@ -159,7 +159,7 @@
       "name": "prettier",
       "steps": [
         {
-          "exec": "nx prettier @saml-authentication-example-for-aws-transfer-family/infrastructure",
+          "exec": "nx prettier @saml-authn-and-authz-example-for-aws-transfer-family/infrastructure",
           "receiveArgs": true
         }
       ]
