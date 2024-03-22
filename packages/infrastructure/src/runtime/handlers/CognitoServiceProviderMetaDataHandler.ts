@@ -1,5 +1,5 @@
-import { Callback, Context } from "aws-lambda";
-import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from "aws-lambda/trigger/api-gateway-proxy";
+import { APIGatewayProxyEvent, Callback, Context } from "aws-lambda";
+import { APIGatewayProxyResult } from "aws-lambda/trigger/api-gateway-proxy";
 import { APIGatewayProxyLambdaHandler, Aws, BasicLambdaTools, Powertools } from "../utils/";
 
 const powertools = new Powertools({
@@ -14,15 +14,15 @@ const powertools = new Powertools({
  * @param _callback
  * @param tools
  */
-export const onEventHandler: APIGatewayProxyLambdaHandler<Record<string, string>> = async (
-  event: APIGatewayProxyEventV2,
+export const onEventHandler: APIGatewayProxyLambdaHandler = async (
+  event: APIGatewayProxyEvent,
   _context: Context,
-  _callback: Callback<APIGatewayProxyResultV2<Record<string, any>>>,
+  _callback: Callback<APIGatewayProxyResult>,
   tools: BasicLambdaTools = {
     aws: Aws.instance({}, powertools),
     powertools,
   },
-): Promise<APIGatewayProxyResultV2<Record<string, any>>> => {
+): Promise<APIGatewayProxyResult> => {
   // const {aws} = tools;
   const logger = tools.powertools.logger;
   logger.info(`Event: ${JSON.stringify(event)}`);
@@ -43,6 +43,8 @@ index="1"/>
             <md:RequestedAttribute FriendlyName="sn" Name="urn:oid:2.5.4.4"/>
             <md:RequestedAttribute FriendlyName="mail" Name="urn:oid:0.9.2342.19200300.100.1.3"/>
             <md:RequestedAttribute FriendlyName="email_verified" Name="urn:custom:email_verified"/>
+            <md:RequestedAttribute FriendlyName="atf_home" Name="urn:custom:atf:home"/>
+            <md:RequestedAttribute FriendlyName="atf_permissions" Name="urn:custom:atf:permissions"/>
         </md:AttributeConsumingService>
     </md:SPSSODescriptor>
 </md:EntityDescriptor>`,

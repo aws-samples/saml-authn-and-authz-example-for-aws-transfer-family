@@ -23,6 +23,8 @@ new TransferFamilyWithSamlStack(app, "aws-transfer-family-with-saml", {
         familyName: ProviderAttribute.other("sn"),
         custom: {
           email_verified: ProviderAttribute.other("email_verified"),
+          "custom:atf_home": ProviderAttribute.other("atf_home"),
+          "custom:atf_permissions": ProviderAttribute.other("atf_permissions"),
         },
       },
     },
@@ -35,6 +37,8 @@ new TransferFamilyWithSamlStack(app, "aws-transfer-family-with-saml", {
         familyName: ProviderAttribute.other("sn"),
         custom: {
           email_verified: ProviderAttribute.other("email_verified"),
+          "custom:atf_home": ProviderAttribute.other("atf_home"),
+          "custom:atf_permissions": ProviderAttribute.other("atf_permissions"),
         },
       },
     },

@@ -59,7 +59,7 @@ export const onEventHandler: APIGatewayProxyLambdaHandler = async (
             logger.info(`Found App Client ${userPoolClient.ClientName} details`);
             const callbackUrl = userPoolClient.CallbackURLs[0];
             const clientId = userPoolClient.ClientId!;
-            const scope = "openid+email";
+            const scope = encodeURIComponent("openid");
             response = redirectToLogin(providerName, clientId, scope, callbackUrl, returnApplicationJson, logger);
           } else {
             response = noAppClientFound(providerName, returnApplicationJson, logger);

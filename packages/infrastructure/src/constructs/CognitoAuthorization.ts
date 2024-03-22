@@ -20,6 +20,7 @@ import {
   AdvancedSecurityMode,
   CustomDomainOptions,
   OAuthScope,
+  StringAttribute,
   UserPool,
   UserPoolClientIdentityProvider,
   UserPoolDomain,
@@ -75,6 +76,14 @@ export class CognitoAuthorization extends Construct implements IDependable {
         tempPasswordValidity: Duration.days(1),
       },
       removalPolicy: RemovalPolicy.DESTROY,
+      customAttributes: {
+        atf_home: new StringAttribute({
+          mutable: true,
+        }),
+        atf_permissions: new StringAttribute({
+          mutable: true,
+        }),
+      },
     });
 
     this.cognitoDomain = this.userPool.addDomain("CognitoDomain", {
