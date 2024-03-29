@@ -48,6 +48,7 @@
     "@aws-lambda-powertools/tracer": "^2.0.2",
     "@aws-sdk/client-cognito-identity-provider": "^3.533.0",
     "@aws-sdk/client-dynamodb": "^3.533.0",
+    "@aws-sdk/client-secrets-manager": "^3.540.0",
     "@aws-sdk/client-ssm": "^3.533.0",
     "@aws-sdk/types": "^3.533.0",
     "@aws-sdk/util-dynamodb": "^3.533.0",
@@ -60,8 +61,7 @@
     "aws-cdk-lib": "^2.133.0",
     "aws-jwt-verify": "^4.0.1",
     "aws-xray-sdk": "^3.5.4",
-    "constructs": "^10.0.5",
-    "jwt-decode": "^4.0.0"
+    "constructs": "^10.0.5"
   },
   "engines": {
     "node": ">= 20.11.1"

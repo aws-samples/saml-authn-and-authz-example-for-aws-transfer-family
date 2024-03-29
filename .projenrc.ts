@@ -125,6 +125,7 @@ const main = async () => {
       "@aws-sdk/client-cognito-identity-provider",
       "@aws-sdk/client-dynamodb",
       "@aws-sdk/client-ssm",
+      "@aws-sdk/client-secrets-manager",
       "@aws-sdk/util-dynamodb",
       "@aws-sdk/types",
       "@smithy/node-http-handler",
@@ -132,8 +133,7 @@ const main = async () => {
       "@smithy/signature-v4",
       "@smithy/types",
       "aws-xray-sdk",
-      "@types/aws-lambda",
-      "jwt-decode"
+      "@types/aws-lambda"
     ] /* Runtime dependencies of this module. */,
     // description: undefined,  /* The description is just a string that helps people understand the purpose of the package. */
     devDeps: [

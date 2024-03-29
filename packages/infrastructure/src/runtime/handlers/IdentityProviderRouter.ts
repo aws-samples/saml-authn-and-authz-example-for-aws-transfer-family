@@ -76,8 +76,7 @@ export const onEventHandler: APIGatewayProxyLambdaHandler = async (
             logger.info(`Found App Client ${userPoolClient.ClientName} details`);
             const callbackUrl = userPoolClient.CallbackURLs[0];
             const clientId = userPoolClient.ClientId!;
-            const scope = encodeURIComponent("openid");
-            response = redirectToLogin(providerName, clientId, scope, callbackUrl, returnApplicationJson, logger);
+            response = redirectToLogin(providerName, clientId, "openid", callbackUrl, returnApplicationJson, logger);
           } else {
             response = noAppClientFound(providerName, returnApplicationJson, logger);
           }
@@ -139,8 +138,21 @@ function redirectToLogin(providerName: string, clientId: string, scope: string, 
       providerName: providerName,
     }),
   );
-  const location = `${process.env.COGNITO_URL}/oauth2/authorize?identity_provider=${providerName}&response_type=code&client_id=${clientId}&scope=${scope}&redirect_uri=${callbackUrl}&state=${state}`;
-  logger.info(`Redirecting to login for ${providerName}: ${location}`);
+  var queryParams: { [key: string]: any } = {
+    identity_provider: providerName,
+    response_type: "code",
+    client_id: clientId,
+    scope: scope,
+    redirect_uri:callbackUrl,
+    state:state
+  };
+
+  const location = new URL(`${process.env.COGNITO_URL}/oauth2/authorize`);
+  for (const property in queryParams) {
+    location.searchParams.append(property, queryParams[property]);
+  }
+
+  logger.info(`Redirecting to login for ${providerName}: ${location.toString()}`);
   if (returnApplicationJson) {
     return {
       headers: {
@@ -150,7 +162,7 @@ function redirectToLogin(providerName: string, clientId: string, scope: string, 
       isBase64Encoded: false,
       statusCode: 302,
       body: JSON.stringify({
-        location: location,
+        location: location.toString(),
       }),
     };
   } else {
@@ -161,7 +173,7 @@ function redirectToLogin(providerName: string, clientId: string, scope: string, 
       headers: {
         "Cache-Control": "no-cache",
         "Content-Type": "text/html",
-        Location: location,
+        Location: location.toString(),
       },
     };
   }

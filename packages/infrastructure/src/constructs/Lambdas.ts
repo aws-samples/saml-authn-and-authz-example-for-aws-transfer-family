@@ -110,6 +110,10 @@ export class Lambdas extends Construct implements IDependable {
           actions: ["cognito-idp:DescribeUserPoolClient", "cognito-idp:ListUserPoolClients"],
           resources: [config.cognitoAuthorization.userPool.userPoolArn],
         }),
+        new PolicyStatement({
+          actions: ["secretsmanager:GetRandomPassword"],
+          resources: ["*"],
+        }),
       ],
     });
     this.cognitoServiceProviderMetaDataHandler = new Function(this, "CognitoServiceProviderMetaDataHandler", {
