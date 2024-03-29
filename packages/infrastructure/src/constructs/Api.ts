@@ -142,6 +142,9 @@ export class Api extends Construct implements IDependable {
         authorizationType: AuthorizationType.NONE,
       },
     );
+    /**
+     * The GET method is for demo purposes only. Do not send PII data such as email addresses as parameters in a GET request
+     */
     authRoute.addMethod("GET", new LambdaIntegration(config.lambdas.identityProviderRouter, {}), {
       authorizationType: AuthorizationType.NONE,
       requestParameters: {

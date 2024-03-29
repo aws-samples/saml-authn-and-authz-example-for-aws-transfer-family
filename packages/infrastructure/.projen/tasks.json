@@ -169,13 +169,13 @@
       },
       "steps": [
         {
-          "exec": "pnpm dlx npm-check-updates@16 --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@types/sinon,aws-cdk-lib,cdk-assets,cdk-nag,esbuild,eslint-import-resolver-typescript,eslint-plugin-import,projen,sinon,ts-node,typescript,vitest,@aws-crypto/sha256-js,@aws-lambda-powertools/logger,@aws-lambda-powertools/metrics,@aws-lambda-powertools/tracer,@aws-sdk/client-cognito-identity-provider,@aws-sdk/client-dynamodb,@aws-sdk/client-ssm,@aws-sdk/types,@aws-sdk/util-dynamodb,@middy/core,@smithy/node-http-handler,@smithy/protocol-http,@smithy/signature-v4,@smithy/types,@types/aws-lambda,aws-jwt-verify,aws-xray-sdk,jwt-decode"
+          "exec": "pnpm dlx npm-check-updates@16 --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@types/sinon,aws-cdk-lib,cdk-assets,cdk-nag,esbuild,eslint-import-resolver-typescript,eslint-plugin-import,projen,sinon,ts-node,typescript,vitest,@aws-crypto/sha256-js,@aws-lambda-powertools/logger,@aws-lambda-powertools/metrics,@aws-lambda-powertools/tracer,@aws-sdk/client-cognito-identity-provider,@aws-sdk/client-dynamodb,@aws-sdk/client-secrets-manager,@aws-sdk/client-ssm,@aws-sdk/types,@aws-sdk/util-dynamodb,@middy/core,@smithy/node-http-handler,@smithy/protocol-http,@smithy/signature-v4,@smithy/types,@types/aws-lambda,aws-jwt-verify,aws-xray-sdk"
         },
         {
           "exec": "pnpm i --no-frozen-lockfile"
         },
         {
-          "exec": "pnpm update @types/node @types/sinon @typescript-eslint/eslint-plugin @typescript-eslint/parser aws-cdk-lib aws-cdk cdk-assets cdk-nag esbuild eslint-import-resolver-typescript eslint-plugin-import eslint projen sinon ts-node typescript vitest @aws-crypto/sha256-js @aws-lambda-powertools/logger @aws-lambda-powertools/metrics @aws-lambda-powertools/tracer @aws-sdk/client-cognito-identity-provider @aws-sdk/client-dynamodb @aws-sdk/client-ssm @aws-sdk/types @aws-sdk/util-dynamodb @middy/core @smithy/node-http-handler @smithy/protocol-http @smithy/signature-v4 @smithy/types @types/aws-lambda aws-jwt-verify aws-xray-sdk constructs jwt-decode"
+          "exec": "pnpm update @types/node @types/sinon @typescript-eslint/eslint-plugin @typescript-eslint/parser aws-cdk-lib aws-cdk cdk-assets cdk-nag esbuild eslint-import-resolver-typescript eslint-plugin-import eslint projen sinon ts-node typescript vitest @aws-crypto/sha256-js @aws-lambda-powertools/logger @aws-lambda-powertools/metrics @aws-lambda-powertools/tracer @aws-sdk/client-cognito-identity-provider @aws-sdk/client-dynamodb @aws-sdk/client-secrets-manager @aws-sdk/client-ssm @aws-sdk/types @aws-sdk/util-dynamodb @middy/core @smithy/node-http-handler @smithy/protocol-http @smithy/signature-v4 @smithy/types @types/aws-lambda aws-jwt-verify aws-xray-sdk constructs"
         },
         {
           "exec": "pnpm dlx projen"
@@ -210,6 +210,30 @@
           "exec": "mkdir -p /tmp/infrastructure/nodejs/node_modules/@saml-authn-and-authz-example-for-aws-transfer-family/infrastructure"
         },
         {
+          "exec": "mkdir -p /tmp/infrastructure/nodejs/node_modules/@aws-crypto/sha256-js"
+        },
+        {
+          "exec": "cp -R /Users/awsgalen/IdeaProjects/saml-authn-and-authz-example-for-aws-transfer-family/packages/infrastructure/node_modules/@aws-crypto/sha256-js/* /tmp/infrastructure/nodejs/node_modules/@aws-crypto/sha256-js"
+        },
+        {
+          "exec": "mkdir -p /tmp/infrastructure/nodejs/node_modules/@middy/core"
+        },
+        {
+          "exec": "cp -R /Users/awsgalen/IdeaProjects/saml-authn-and-authz-example-for-aws-transfer-family/packages/infrastructure/node_modules/@middy/core/* /tmp/infrastructure/nodejs/node_modules/@middy/core"
+        },
+        {
+          "exec": "mkdir -p /tmp/infrastructure/nodejs/node_modules/aws-jwt-verify"
+        },
+        {
+          "exec": "cp -R /Users/awsgalen/IdeaProjects/saml-authn-and-authz-example-for-aws-transfer-family/packages/infrastructure/node_modules/aws-jwt-verify/* /tmp/infrastructure/nodejs/node_modules/aws-jwt-verify"
+        },
+        {
+          "exec": "mkdir -p /tmp/infrastructure/nodejs/node_modules/aws-xray-sdk"
+        },
+        {
+          "exec": "cp -R /Users/awsgalen/IdeaProjects/saml-authn-and-authz-example-for-aws-transfer-family/packages/infrastructure/node_modules/aws-xray-sdk/* /tmp/infrastructure/nodejs/node_modules/aws-xray-sdk"
+        },
+        {
           "exec": "rm -Rf ./lib/runtime",
           "cwd": "/Users/awsgalen/IdeaProjects/saml-authn-and-authz-example-for-aws-transfer-family/packages/infrastructure"
         },
@@ -218,25 +242,25 @@
           "cwd": "/Users/awsgalen/IdeaProjects/saml-authn-and-authz-example-for-aws-transfer-family/packages/infrastructure"
         },
         {
-          "exec": "esbuild src/runtime/handlers/ATFServerIdentityProvider.ts --platform=node  --bundle   --outfile=lib/runtime/esbuild/ATFServerIdentityProvider/index.js"
+          "exec": "esbuild src/runtime/handlers/ATFServerIdentityProvider.ts --platform=node  --bundle  --external:@aws-sdk/types --external:@aws-lambda-powertools/logger --external:@aws-lambda-powertools/metrics --external:@aws-lambda-powertools/tracer --external:@aws-sdk/client-cognito-identity-provider --external:@aws-sdk/client-dynamodb --external:@aws-sdk/client-secrets-manager --external:@aws-sdk/client-ssm --external:@aws-sdk/util-dynamodb --external:@smithy/node-http-handler --external:@smithy/protocol-http --external:@smithy/signature-v4 --external:@smithy/types --external:@types/aws-lambda --external:constructs  --outfile=lib/runtime/esbuild/ATFServerIdentityProvider/index.js"
         },
         {
           "exec": "zip -j -r ./dist/ATFServerIdentityProvider.zip lib/runtime/esbuild/ATFServerIdentityProvider/index.js"
         },
         {
-          "exec": "esbuild src/runtime/handlers/SamlCallbackHandler.ts --platform=node  --bundle   --outfile=lib/runtime/esbuild/SamlCallbackHandler/index.js"
+          "exec": "esbuild src/runtime/handlers/SamlCallbackHandler.ts --platform=node  --bundle  --external:@aws-sdk/types --external:@aws-lambda-powertools/logger --external:@aws-lambda-powertools/metrics --external:@aws-lambda-powertools/tracer --external:@aws-sdk/client-cognito-identity-provider --external:@aws-sdk/client-dynamodb --external:@aws-sdk/client-secrets-manager --external:@aws-sdk/client-ssm --external:@aws-sdk/util-dynamodb --external:@smithy/node-http-handler --external:@smithy/protocol-http --external:@smithy/signature-v4 --external:@smithy/types --external:@types/aws-lambda --external:constructs  --outfile=lib/runtime/esbuild/SamlCallbackHandler/index.js"
         },
         {
           "exec": "zip -j -r ./dist/SamlCallbackHandler.zip lib/runtime/esbuild/SamlCallbackHandler/index.js"
         },
         {
-          "exec": "esbuild src/runtime/handlers/CognitoServiceProviderMetaDataHandler.ts --platform=node  --bundle   --outfile=lib/runtime/esbuild/CognitoServiceProviderMetaDataHandler/index.js"
+          "exec": "esbuild src/runtime/handlers/CognitoServiceProviderMetaDataHandler.ts --platform=node  --bundle  --external:@aws-sdk/types --external:@aws-lambda-powertools/logger --external:@aws-lambda-powertools/metrics --external:@aws-lambda-powertools/tracer --external:@aws-sdk/client-cognito-identity-provider --external:@aws-sdk/client-dynamodb --external:@aws-sdk/client-secrets-manager --external:@aws-sdk/client-ssm --external:@aws-sdk/util-dynamodb --external:@smithy/node-http-handler --external:@smithy/protocol-http --external:@smithy/signature-v4 --external:@smithy/types --external:@types/aws-lambda --external:constructs  --outfile=lib/runtime/esbuild/CognitoServiceProviderMetaDataHandler/index.js"
         },
         {
           "exec": "zip -j -r ./dist/CognitoServiceProviderMetaDataHandler.zip lib/runtime/esbuild/CognitoServiceProviderMetaDataHandler/index.js"
         },
         {
-          "exec": "esbuild src/runtime/handlers/IdentityProviderRouter.ts --platform=node  --bundle   --outfile=lib/runtime/esbuild/IdentityProviderRouter/index.js"
+          "exec": "esbuild src/runtime/handlers/IdentityProviderRouter.ts --platform=node  --bundle  --external:@aws-sdk/types --external:@aws-lambda-powertools/logger --external:@aws-lambda-powertools/metrics --external:@aws-lambda-powertools/tracer --external:@aws-sdk/client-cognito-identity-provider --external:@aws-sdk/client-dynamodb --external:@aws-sdk/client-secrets-manager --external:@aws-sdk/client-ssm --external:@aws-sdk/util-dynamodb --external:@smithy/node-http-handler --external:@smithy/protocol-http --external:@smithy/signature-v4 --external:@smithy/types --external:@types/aws-lambda --external:constructs  --outfile=lib/runtime/esbuild/IdentityProviderRouter/index.js"
         },
         {
           "exec": "zip -j -r ./dist/IdentityProviderRouter.zip lib/runtime/esbuild/IdentityProviderRouter/index.js"
