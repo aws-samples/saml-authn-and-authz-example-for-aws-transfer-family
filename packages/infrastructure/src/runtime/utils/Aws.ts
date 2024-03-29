@@ -36,7 +36,7 @@ import {
   ListUserPoolClientsCommandInput,
   ListUserPoolClientsCommandOutput,
   paginateListUserPoolClients,
-  UserPoolClientType
+  UserPoolClientType,
 } from "@aws-sdk/client-cognito-identity-provider";
 import {
   DynamoDBClient,
@@ -57,15 +57,15 @@ import {
   TransactWriteItemsCommandOutput,
   UpdateItemCommand,
   UpdateItemCommandInput,
-  UpdateItemCommandOutput
+  UpdateItemCommandOutput,
 } from "@aws-sdk/client-dynamodb";
+import { GetRandomPasswordCommand, GetRandomPasswordCommandInput, GetRandomPasswordCommandOutput, SecretsManagerClient } from "@aws-sdk/client-secrets-manager";
 import { GetParameterCommand, GetParameterCommandInput, GetParameterCommandOutput, SSMClient } from "@aws-sdk/client-ssm";
 
 import { Paginator } from "@aws-sdk/types";
 import { marshall as ddbMarshal, unmarshall as ddbUnmarshal } from "@aws-sdk/util-dynamodb";
 
 import { Powertools } from "./Powertools";
-import { GetRandomPasswordCommand, GetRandomPasswordCommandInput, GetRandomPasswordCommandOutput, SecretsManagerClient } from "@aws-sdk/client-secrets-manager";
 
 export type PaginationConfig = {
   pageSize?: number;
@@ -138,11 +138,11 @@ export class Aws implements AwsApiCalls {
     if (this._cognitoIdentityProviderClient == undefined) {
       this._cognitoIdentityProviderClient = this._powertools
         ? this._powertools.tracer.captureAWSv3Client(
-          new CognitoIdentityProviderClient({
-            ...this.config,
-            retryMode: "adaptive"
-          })
-        )
+            new CognitoIdentityProviderClient({
+              ...this.config,
+              retryMode: "adaptive",
+            }),
+          )
         : new CognitoIdentityProviderClient(this.config);
     }
     return this._cognitoIdentityProviderClient;
@@ -152,11 +152,11 @@ export class Aws implements AwsApiCalls {
     if (this._secretsManagerClient == undefined) {
       this._secretsManagerClient = this._powertools
         ? this._powertools.tracer.captureAWSv3Client(
-          new SecretsManagerClient({
-            ...this.config,
-            retryMode: "adaptive"
-          })
-        )
+            new SecretsManagerClient({
+              ...this.config,
+              retryMode: "adaptive",
+            }),
+          )
         : new SecretsManagerClient(this.config);
     }
     return this._secretsManagerClient;
@@ -166,11 +166,11 @@ export class Aws implements AwsApiCalls {
     if (this._ssmClient == undefined) {
       this._ssmClient = this._powertools
         ? this._powertools.tracer.captureAWSv3Client(
-          new SSMClient({
-            ...this.config,
-            retryMode: "adaptive"
-          })
-        )
+            new SSMClient({
+              ...this.config,
+              retryMode: "adaptive",
+            }),
+          )
         : new SSMClient(this.config);
     }
     return this._ssmClient;
@@ -180,11 +180,11 @@ export class Aws implements AwsApiCalls {
     if (this._ddbClient == undefined) {
       this._ddbClient = this._powertools
         ? this._powertools.tracer.captureAWSv3Client(
-          new DynamoDBClient({
-            ...this.config,
-            retryMode: "adaptive"
-          })
-        )
+            new DynamoDBClient({
+              ...this.config,
+              retryMode: "adaptive",
+            }),
+          )
         : new DynamoDBClient(this.config);
     }
     return this._ddbClient;
@@ -238,10 +238,10 @@ export class Aws implements AwsApiCalls {
         client: this.ddbClient,
         pageSize: config.pageSize,
         startingToken: config.startingToken,
-        stopOnSameToken: config.stopOnSameToken
+        stopOnSameToken: config.stopOnSameToken,
       },
       input,
-      ...additionalArguments
+      ...additionalArguments,
     );
   }
 
@@ -272,9 +272,9 @@ export class Aws implements AwsApiCalls {
   paginateListUserPoolClients(input: ListUserPoolClientsCommandInput): Paginator<ListUserPoolClientsCommandOutput> {
     return paginateListUserPoolClients(
       {
-        client: this.cognitoIdentityProviderClient
+        client: this.cognitoIdentityProviderClient,
       },
-      input
+      input,
     );
   }
 
@@ -282,14 +282,14 @@ export class Aws implements AwsApiCalls {
     let result: UserPoolClientType | undefined;
 
     for await (const page of this.paginateListUserPoolClients({
-      UserPoolId: userPoolId
+      UserPoolId: userPoolId,
     })) {
       if (page.UserPoolClients != undefined && page.UserPoolClients.length > 0) {
         for (const client of page.UserPoolClients) {
           if (client.ClientName == clientName) {
             const describeUserPoolClientResponse = await this.describeUserPoolClient({
               ClientId: client.ClientId,
-              UserPoolId: userPoolId
+              UserPoolId: userPoolId,
             });
             const userPoolClient = describeUserPoolClientResponse.UserPoolClient;
             if (userPoolClient != undefined) {
@@ -302,8 +302,6 @@ export class Aws implements AwsApiCalls {
     }
     return result;
   }
-
-
 
   async getRandomPassword(input: GetRandomPasswordCommandInput): Promise<GetRandomPasswordCommandOutput> {
     return this.secretsManagerClient.send(new GetRandomPasswordCommand(input));

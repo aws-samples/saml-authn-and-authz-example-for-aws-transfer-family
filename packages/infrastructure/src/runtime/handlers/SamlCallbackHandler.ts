@@ -16,14 +16,13 @@
  */
 
 import { marshall } from "@aws-sdk/util-dynamodb";
+import { CognitoJwtVerifier } from "aws-jwt-verify";
 import { APIGatewayProxyEvent, Callback, Context } from "aws-lambda";
 import { APIGatewayProxyResult } from "aws-lambda/trigger/api-gateway-proxy";
 import { APIGatewayProxyLambdaHandlerWithJwtVerifier, Aws, LambdaToolsWithJwtVerifier, Powertools, SimpleJwksCacheSingleton } from "../utils/";
-import { CognitoJwtVerifier } from "aws-jwt-verify";
-
 
 const powertools = new Powertools({
-  serviceName: "SamlCallbackHandler"
+  serviceName: "SamlCallbackHandler",
 });
 
 export const onEventHandler: APIGatewayProxyLambdaHandlerWithJwtVerifier<any> = async (
@@ -35,13 +34,13 @@ export const onEventHandler: APIGatewayProxyLambdaHandlerWithJwtVerifier<any> = 
     powertools,
     verifier: CognitoJwtVerifier.create(
       {
-        userPoolId: process.env.USER_POOL_ID!
+        userPoolId: process.env.USER_POOL_ID!,
       },
       {
-        jwksCache: SimpleJwksCacheSingleton.instance()
-      }
-    )
-  }
+        jwksCache: SimpleJwksCacheSingleton.instance(),
+      },
+    ),
+  },
 ): Promise<APIGatewayProxyResult> => {
   const logger = tools.powertools.logger;
   try {
@@ -75,7 +74,7 @@ export const onEventHandler: APIGatewayProxyLambdaHandlerWithJwtVerifier<any> = 
       grant_type: "authorization_code",
       client_id: clientId,
       code: code,
-      redirect_uri: `https://${event.headers.Host}${event.requestContext.path}`
+      redirect_uri: `https://${event.headers.Host}${event.requestContext.path}`,
     };
     const params = new URLSearchParams();
     for (const property in formData) {
@@ -86,8 +85,8 @@ export const onEventHandler: APIGatewayProxyLambdaHandlerWithJwtVerifier<any> = 
       body: formBody,
       method: "POST",
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      }
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
     });
     logger.info(`Request: ${JSON.stringify(tokenRequest)}`);
     const tokenResponse = await fetch(tokenRequest);
@@ -96,7 +95,7 @@ export const onEventHandler: APIGatewayProxyLambdaHandlerWithJwtVerifier<any> = 
     const accessToken = body.access_token;
     const jwtPayload = await tools.verifier.verify(accessToken, {
       tokenUse: "access",
-      clientId: clientId
+      clientId: clientId,
     });
 
     const userInfoEndpoint = `${process.env.COGNITO_URL}/oauth2/userInfo`;
@@ -104,8 +103,8 @@ export const onEventHandler: APIGatewayProxyLambdaHandlerWithJwtVerifier<any> = 
       method: "GET",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
-        Authorization: `Bearer ${accessToken}`
-      }
+        Authorization: `Bearer ${accessToken}`,
+      },
     });
     const userInfoResponse = await fetch(userInfoRequest);
     const userInfo = (await userInfoResponse.json()) as Record<string, any>;
@@ -117,7 +116,7 @@ export const onEventHandler: APIGatewayProxyLambdaHandlerWithJwtVerifier<any> = 
       PasswordLength: 9,
       IncludeSpace: false,
       ExcludePunctuation: true,
-      RequireEachIncludedType: true
+      RequireEachIncludedType: true,
     });
     if (password.RandomPassword == undefined) {
       throw new Error("Error generating temporary password generated");
@@ -130,20 +129,20 @@ export const onEventHandler: APIGatewayProxyLambdaHandlerWithJwtVerifier<any> = 
         accessToken: accessToken,
         ttl: jwtPayload.exp,
         userPoolClientId: clientId,
-        userInfo: userInfo
-      })
+        userInfo: userInfo,
+      }),
     });
 
     return {
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
       statusCode: 200,
       body: JSON.stringify({
         username: email,
         password: password,
-        expires: jwtPayload.exp
-      })
+        expires: jwtPayload.exp,
+      }),
     };
   } catch (e) {
     const error = e as Error;
@@ -151,16 +150,16 @@ export const onEventHandler: APIGatewayProxyLambdaHandlerWithJwtVerifier<any> = 
     return {
       headers: {
         "Cache-Control": "no-cache",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
       isBase64Encoded: false,
       statusCode: 500,
       body: JSON.stringify({
         error: {
           name: error.name,
-          message: error.message
-        }
-      })
+          message: error.message,
+        },
+      }),
     };
   }
 };

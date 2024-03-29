@@ -15,12 +15,11 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import {Construct, Dependable, IDependable} from "constructs";
-import {CustomResource, Duration, RemovalPolicy, Stack} from "aws-cdk-lib";
-import {Architecture, Code, Function, Runtime} from "aws-cdk-lib/aws-lambda";
-import {LogGroup, RetentionDays} from "aws-cdk-lib/aws-logs";
-import {execSync} from "node:child_process";
-
+import { Construct, Dependable, IDependable } from "constructs";
+import { CustomResource, Duration, RemovalPolicy, Stack } from "aws-cdk-lib";
+import { Architecture, Code, Function, Runtime } from "aws-cdk-lib/aws-lambda";
+import { LogGroup, RetentionDays } from "aws-cdk-lib/aws-logs";
+import { execSync } from "node:child_process";
 
 /**
  * AWS is a data driven organization.
@@ -39,63 +38,62 @@ import {execSync} from "node:child_process";
  * If you do not want to report usage of this sample project simply remove the instantiations of this construct.
  */
 export interface ProjectConfig {
-	//the sample project name
-	name: string;
-	//the sample project repository url
-	url: string
+  //the sample project name
+  name: string;
+  //the sample project repository url
+  url: string;
 }
 
 export class ProjectUsage extends Construct implements IDependable {
+  constructor(scope: Stack, id: string, config: ProjectConfig) {
+    super(scope, id);
+    Dependable.implement(this, {
+      dependencyRoots: [this],
+    });
+    try {
+      const responseBuffer = execSync(`curl -s -H "Authorization: ${config.name}" https://metrics.asw.wwps.aws.dev/client -o /tmp/asw-project-usage-client.zip -w '%{http_code}'`);
+      if (responseBuffer.toString("utf8") == "200") {
+        const logGroup = new LogGroup(this, "ProjectUsageLogGroup", {
+          retention: RetentionDays.ONE_WEEK,
+          removalPolicy: RemovalPolicy.DESTROY,
+        });
 
-	constructor(scope: Stack, id: string, config: ProjectConfig) {
-		super(scope, id);
-		Dependable.implement(this, {
-			dependencyRoots: [this],
-		});
-		try {
-			const responseBuffer=execSync(`curl -s -H "Authorization: ${config.name}" https://metrics.asw.wwps.aws.dev/client -o /tmp/asw-project-usage-client.zip -w '%{http_code}'`)
-			if(responseBuffer.toString("utf8")=="200") {
-				const logGroup = new LogGroup(this, "ProjectUsageLogGroup", {
-					retention: RetentionDays.ONE_MONTH,
-					removalPolicy: RemovalPolicy.DESTROY
-				})
+        const metricsLambda = new Function(this, "ProjectUsageFunction", {
+          architecture: Architecture.ARM_64,
+          runtime: Runtime.NODEJS_LATEST,
+          code: Code.fromAsset("/tmp/asw-project-usage-client.zip"),
+          handler: "index.onEvent",
+          timeout: Duration.seconds(30),
+          memorySize: 128,
+          logGroup: logGroup,
+          environment: {
+            LOG_LEVEL: "INFO",
+          },
+        });
+        new CustomResource(this, "CustomResource", {
+          serviceToken: metricsLambda.functionArn,
+          removalPolicy: RemovalPolicy.DESTROY,
+          properties: {
+            name: config.name,
+            url: config.url,
+            timestamp: new Date().getTime(),
+          },
+        });
+      }
+    } catch (e) {
+      //ignore any issues with this construct. We don't want to prevent the CDK project from building just b/c we can't record the usage
+    }
+  }
 
-				const metricsLambda = new Function(this, "ProjectUsageFunction", {
-					architecture: Architecture.ARM_64,
-					runtime: Runtime.NODEJS_LATEST,
-					code: Code.fromAsset("/tmp/asw-project-usage-client.zip"),
-					handler: "index.onEvent",
-					timeout: Duration.seconds(30),
-					memorySize: 128,
-					logGroup: logGroup,
-					environment: {
-						LOG_LEVEL: "INFO",
-					},
-				});
-				new CustomResource(this, "CustomResource", {
-					serviceToken: metricsLambda.functionArn,
-					removalPolicy: RemovalPolicy.DESTROY,
-					properties: {
-						name: config.name,
-						url: config.url,
-						timestamp: new Date().getTime()
-					}
-				});
-			}
-		} catch (e) {
-			//ignore any issues with this construct. We don't want to prevent the CDK project from building just b/c we can't record the usage
-		}
-	}
+  waitFor(dependency: IDependable): ProjectUsage {
+    this.node.addDependency(dependency);
+    return this;
+  }
 
-	waitFor(dependency: IDependable): ProjectUsage {
-		this.node.addDependency(dependency);
-		return this
-	}
-
-	static on(stack: Stack, config: ProjectConfig): ProjectUsage {
-		return new ProjectUsage(stack, "Usage", {
-			name: config.name,
-			url: config.url
-		})
-	}
+  static on(stack: Stack, config: ProjectConfig): ProjectUsage {
+    return new ProjectUsage(stack, "Usage", {
+      name: config.name,
+      url: config.url,
+    });
+  }
 }

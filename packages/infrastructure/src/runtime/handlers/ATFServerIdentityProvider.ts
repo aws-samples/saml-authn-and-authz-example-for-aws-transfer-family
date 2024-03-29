@@ -199,7 +199,6 @@ function permissionToActions(directoryPermission: DirectoryPermission, logger: L
   return actions;
 }
 
-
 function homeDirCondition(homeDir: DirectoryPermission, permissions: DirectoryPermission[]): { [key: string]: any } | undefined {
   const homeEntry = `/${cleanDir(homeDir.dir)}`;
   return homeEntry != "/"

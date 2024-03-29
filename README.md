@@ -37,3 +37,10 @@ The permissions are mapped to the following S3 actions
 * **rw** - ["s3:GetObject", "s3:GetObjectVersion", "s3:GetObjectACL","s3:PutObject", "s3:DeleteObjectVersion", "s3:DeleteObject", "s3:PutObjectACL"]
 
 
+# Deployment
+
+*Requires AWS credentials on the terminal* 
+
+1. `pnpm install`
+2. `projen deploy`
+

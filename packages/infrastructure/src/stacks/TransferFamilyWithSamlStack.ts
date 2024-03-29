@@ -34,15 +34,12 @@ export class TransferFamilyWithSamlStack extends Stack {
       server.addSamlIdp(value);
     });
     this.cdkNagSuppressions();
-    ProjectUsage.on(this,{
+    ProjectUsage.on(this, {
       name: PROJECT_NAME,
-      url: GIT_REPO_URL
-    }).waitFor(server)
+      url: GIT_REPO_URL,
+    }).waitFor(server);
     Tags.of(this).add("Solution", PROJECT_NAME);
-    Tags.of(this).add(
-      "Url",
-      GIT_REPO_URL,
-    );
+    Tags.of(this).add("Url", GIT_REPO_URL);
   }
 
   private cdkNagSuppressions() {

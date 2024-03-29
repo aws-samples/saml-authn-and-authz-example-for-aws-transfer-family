@@ -143,8 +143,8 @@ function redirectToLogin(providerName: string, clientId: string, scope: string, 
     response_type: "code",
     client_id: clientId,
     scope: scope,
-    redirect_uri:callbackUrl,
-    state:state
+    redirect_uri: callbackUrl,
+    state: state,
   };
 
   const location = new URL(`${process.env.COGNITO_URL}/oauth2/authorize`);
