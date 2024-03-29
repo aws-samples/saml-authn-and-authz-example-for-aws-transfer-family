@@ -15,10 +15,12 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { Stack, StackProps } from "aws-cdk-lib";
+import { Stack, StackProps, Tags } from "aws-cdk-lib";
 import { NagSuppressions } from "cdk-nag";
 import { Construct } from "constructs";
 import { ATFServerWithSaml, SamlIdp } from "../constructs/ATFServerWithSaml";
+import { GIT_REPO_URL, PROJECT_NAME } from "../index";
+import { ProjectUsage } from "../constructs/ProjectUsage";
 
 export interface TransferFamilyWithSamlStackProps extends StackProps {
   samlIdps: SamlIdp[];
@@ -32,6 +34,15 @@ export class TransferFamilyWithSamlStack extends Stack {
       server.addSamlIdp(value);
     });
     this.cdkNagSuppressions();
+    ProjectUsage.on(this,{
+      name: PROJECT_NAME,
+      url: GIT_REPO_URL
+    }).waitFor(server)
+    Tags.of(this).add("Solution", PROJECT_NAME);
+    Tags.of(this).add(
+      "Url",
+      GIT_REPO_URL,
+    );
   }
 
   private cdkNagSuppressions() {

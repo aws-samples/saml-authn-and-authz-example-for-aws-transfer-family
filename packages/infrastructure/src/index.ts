@@ -15,6 +15,8 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+export const PROJECT_NAME="saml-authn-and-authz-example-for-aws-transfer-family"
+export const GIT_REPO_URL=`https://github.com/aws-samples/${PROJECT_NAME}`
 export function safeName(name: string): string {
   return name.replace(/[^a-zA-Z0-9]/g, "");
 }

@@ -34,7 +34,7 @@ new TransferFamilyWithSamlStack(app, "aws-transfer-family-with-saml", {
     /*
 
     {
-      name: "@institution01.example.com",
+      name: "@institution01.example.edu",
       metadataUrl: "https://<YOUR_SAML_IDP>/simplesaml/module.php/saml/idp/metadata",
       attributeMap: {
         email: ProviderAttribute.other("mail"),
@@ -48,7 +48,7 @@ new TransferFamilyWithSamlStack(app, "aws-transfer-family-with-saml", {
       },
     },
     {
-      name: "@institution02.example.com",
+      name: "@institution02.example.edu",
       metadataUrl: "https://<YOUR_SAML_IDP>/simplesaml/module.php/saml/idp/metadata",
       attributeMap: {
         email: ProviderAttribute.other("mail"),

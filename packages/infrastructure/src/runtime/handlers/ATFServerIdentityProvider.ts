@@ -199,9 +199,7 @@ function permissionToActions(directoryPermission: DirectoryPermission, logger: L
   return actions;
 }
 
-// function hasReadPermission(directoryPermission: DirectoryPermission,logger:Logger): boolean {
-//   return parsePermissions(directoryPermission, logger).includes("r")
-// }
+
 function homeDirCondition(homeDir: DirectoryPermission, permissions: DirectoryPermission[]): { [key: string]: any } | undefined {
   const homeEntry = `/${cleanDir(homeDir.dir)}`;
   return homeEntry != "/"
