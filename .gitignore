@@ -46,3 +46,6 @@ appsec
 !/pnpm-workspace.yaml
 !/nx.json
 !/.projenrc.ts
+
+# nx local cache
+.nx/
