@@ -39,7 +39,7 @@
     "sinon": "^17.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.2",
-    "vitest": "^3.2.6"
+    "vitest": "^4.1.11"
   },
   "dependencies": {
     "@aws-crypto/sha256-js": "^5.2.0",
