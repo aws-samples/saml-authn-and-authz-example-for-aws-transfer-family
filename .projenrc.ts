@@ -38,6 +38,8 @@ const defaultReleaseBranch = "main";
 // - cdkCliVersion: the aws-cdk CLI, versioned separately (2.1000+) since 2025.
 const cdkVersion = "2.134.0";
 const cdkCliVersion = "2.1000.0";
+// Version of the PR title lint action used in .github/workflows/pull-request-lint.yml.
+const semanticPrActionVersion = "v6.1.1";
 const nodeVersion = "20.11.1";
 const pnpmVersion = "8.15.3";
 const jsiiReleaseVersion = "1.94.0";
@@ -202,6 +204,17 @@ const main = async () => {
 
   // nx local cache
   root.gitignore.exclude(".nx/");
+
+  // projen 0.80 hard-codes amannn/action-semantic-pull-request@v5.4.0 in the
+  // generated pull-request-lint workflow and has no option for it, so set the
+  // version here. Bump it here (not in the .yml) when Dependabot proposes a
+  // newer release, or the next projen run reverts the change.
+  root.github
+    ?.tryFindWorkflow("pull-request-lint")
+    ?.file?.addOverride(
+      "jobs.validate.steps.0.uses",
+      `amannn/action-semantic-pull-request@${semanticPrActionVersion}`
+    );
 
   new PnpmWorkspace(root);
   new Nx(root); // add nx to root
