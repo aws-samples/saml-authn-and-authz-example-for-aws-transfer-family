@@ -26,7 +26,7 @@
     "@types/node": "^20",
     "@types/sinon": "^17.0.3",
     "@typescript-eslint/eslint-plugin": "^6",
-    "@typescript-eslint/parser": "^6",
+    "@typescript-eslint/parser": "^8",
     "aws-cdk": "^2.1000.0",
     "aws-cdk-lib": "^2.133.0",
     "cdk-assets": "^4.0.0",
