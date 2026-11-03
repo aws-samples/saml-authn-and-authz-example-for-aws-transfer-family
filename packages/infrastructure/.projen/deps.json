@@ -25,7 +25,7 @@
     },
     {
       "name": "aws-cdk",
-      "version": "^2.134.0",
+      "version": "^2.1000.0",
       "type": "build"
     },
     {

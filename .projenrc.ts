@@ -16,7 +16,6 @@
  */
 
 import { awscdk, javascript } from "projen";
-import { execSync } from "child_process";
 import { ReleaseTrigger } from "projen/lib/release";
 
 import { TypeScriptProject } from "projen/lib/typescript";
@@ -31,7 +30,14 @@ import { TaskStep } from "projen/lib/task-model";
 
 
 const defaultReleaseBranch = "main";
-const cdkVersion = `${execSync("npm show 'aws-cdk-lib' version")}`.trim();
+// Pinned so that projen synthesis is reproducible. Previously this was read
+// from `npm show aws-cdk-lib version` at synth time, so every projen run moved
+// the ranges to the latest release. Dependabot or a maintainer bumps these
+// here (and re-runs projen) when upgrading CDK.
+// - cdkVersion: minimum aws-cdk-lib version (rendered as ^cdkVersion).
+// - cdkCliVersion: the aws-cdk CLI, versioned separately (2.1000+) since 2025.
+const cdkVersion = "2.134.0";
+const cdkCliVersion = "2.1000.0";
 const nodeVersion = "20.11.1";
 const pnpmVersion = "8.15.3";
 const jsiiReleaseVersion = "1.94.0";
@@ -89,6 +95,8 @@ const main = async () => {
     sampleCode: false,
     license: "MIT-0",
     copyrightOwner: "Amazon.com, Inc. or its affiliates. All Rights Reserved.",
+    // Fixed so LICENSE does not change to the current year on every projen run.
+    copyrightPeriod: "2024",
     tsconfig: {
       compilerOptions: {
         target: "ES2022",
@@ -188,6 +196,12 @@ const main = async () => {
       "vitest"
     ]
   });
+
+  // projen 0.80 adds aws-cdk@cdkVersion; replace it with the CLI's own version line.
+  infrastructure.addDevDeps(`aws-cdk@^${cdkCliVersion}`);
+
+  // nx local cache
+  root.gitignore.exclude(".nx/");
 
   new PnpmWorkspace(root);
   new Nx(root); // add nx to root
