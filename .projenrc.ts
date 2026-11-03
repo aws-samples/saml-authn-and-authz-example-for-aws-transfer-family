@@ -36,6 +36,48 @@ const nodeVersion = "20.11.1";
 const pnpmVersion = "8.15.3";
 const jsiiReleaseVersion = "1.94.0";
 const namespace = "@saml-authn-and-authz-example-for-aws-transfer-family";
+
+// Security overrides for transitive dependencies, rendered into the root
+// package.json under `pnpm.overrides`. Keys use pnpm's `name@<selector>` form,
+// which projen's addPackageResolutions() cannot express, so they are written
+// with package.addField() instead. Edit this list, not package.json.
+const pnpmOverrides: Record<string, string> = {
+  "form-data@<2.5.6": ">=2.5.6",
+  "form-data@>=4.0.0 <4.0.6": ">=4.0.6",
+  "fast-xml-parser@<4.5.5": ">=4.5.5",
+  "braces@<3.0.3": ">=3.0.3",
+  "brace-expansion@<1.1.16": ">=1.1.16",
+  "brace-expansion@>=2.0.0 <2.1.6": ">=2.1.6",
+  "brace-expansion@>=4.0.0 <5.0.12": ">=5.0.12 <6.0.0",
+  "follow-redirects@<1.16.2": ">=1.16.2 <2.0.0",
+  "nanoid@<3.3.12": ">=3.3.12",
+  "postcss@<8.5.18": ">=8.5.18",
+  "rollup@>=4.0.0 <4.59.0": ">=4.59.0",
+  "glob@>=10.2.0 <10.5.0": ">=10.5.0",
+  "tar@<7.5.11": ">=7.5.11",
+  "sigstore@<4.1.1": ">=4.1.1",
+  "ip-address@<10.3.1": ">=10.3.1",
+  "js-yaml@>=3.0.0 <3.15.2": ">=3.15.2",
+  "js-yaml@>=4.0.0 <4.3.2": ">=4.3.2",
+  "tmp@<0.2.6": ">=0.2.6",
+  "flatted@<3.4.2": ">=3.4.2",
+  "aws-cdk-lib@<2.260.0": ">=2.260.0",
+  "constructs@<10.5.0": ">=10.5.0",
+  "minimatch@>=3.0.0 <3.1.3": ">=3.1.3 <4.0.0",
+  "minimatch@>=5.0.0 <5.1.8": ">=5.1.8 <6.0.0",
+  "minimatch@>=9.0.0 <9.0.7": ">=9.0.7 <10.0.0",
+  "vite@>=5.0.0 <6.4.5": ">=6.4.5 <7.0.0",
+  "tinypool@<2.1.2": ">=2.1.2 <3.0.0",
+  "esbuild@<0.25.0": ">=0.25.0 <0.26.0",
+  "ejs@<3.1.10": ">=3.1.10",
+  "picomatch@>=2.0.0 <2.3.2": ">=2.3.2 <3.0.0",
+  "uuid@<11.1.1": ">=11.1.1 <12.0.0",
+  "postcss-selector-parser@<7.1.6": ">=7.1.6 <8.0.0",
+  "@smithy/config-resolver@<4.4.0": ">=4.4.0 <5.0.0",
+  "axios@>=1.0.0 <1.20.0": ">=1.20.0 <2.0.0",
+  "smol-toml@<1.7.1": ">=1.7.1 <2.0.0"
+};
+
 const main = async () => {
   const root = new TypeScriptProject({
     name: `${namespace}/root`,
@@ -150,6 +192,7 @@ const main = async () => {
   new PnpmWorkspace(root);
   new Nx(root); // add nx to root
   root.package.addField("packageManager", `pnpm@${pnpmVersion}`);
+  root.package.addField("pnpm", { overrides: pnpmOverrides });
   root.npmrc.addConfig("auto-install-peers", "true");
   root.tasks.addTask("nx", {
     receiveArgs: true
@@ -191,20 +234,17 @@ const main = async () => {
     "constructs"], (p: NodeProject, esBuildExternal: string) => {
     const steps: TaskStep[] = [
       {
-        exec: "rm -Rf ./lib/runtime",
-        cwd: p.outdir
+        exec: "rm -Rf ./lib/runtime"
       },
       {
-        exec: "mkdir ./dist",
-        cwd: p.outdir
+        exec: "mkdir ./dist"
       },
       ...zipLambdaFunction("src/runtime/handlers/ATFServerIdentityProvider.ts", esBuildExternal),
       ...zipLambdaFunction("src/runtime/handlers/SamlCallbackHandler.ts", esBuildExternal),
       ...zipLambdaFunction("src/runtime/handlers/CognitoServiceProviderMetaDataHandler.ts", esBuildExternal),
       ...zipLambdaFunction("src/runtime/handlers/IdentityProviderRouter.ts", esBuildExternal),
       {
-        exec: `zip -r ${p.outdir}/dist/lambdas-layer.zip ./nodejs`,
-        cwd: `/tmp/${p.name}`
+        exec: `out="$(pwd)/dist/lambdas-layer.zip" && cd /tmp/${p.name} && zip -r "$out" ./nodejs`
       }
     ];
     return steps;
