@@ -59,7 +59,7 @@
     "@smithy/types": "^4.0.0",
     "@types/aws-lambda": "^8.10.136",
     "aws-cdk-lib": "^2.134.0",
-    "aws-jwt-verify": "^4.0.1",
+    "aws-jwt-verify": "^5.2.1",
     "aws-xray-sdk": "^3.10.0",
     "constructs": "^10.0.5"
   },
