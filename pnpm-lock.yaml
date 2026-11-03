@@ -135,8 +135,8 @@ importers:
         specifier: ^2.275.0
         version: 2.275.0(constructs@10.8.1)
       aws-jwt-verify:
-        specifier: ^4.0.1
-        version: 4.0.1
+        specifier: ^5.2.1
+        version: 5.2.1
       aws-xray-sdk:
         specifier: ^3.10.0
         version: 3.12.0
@@ -2601,9 +2601,9 @@ packages:
     hasBin: true
     dev: true
 
-  /aws-jwt-verify@4.0.1:
-    resolution: {integrity: sha512-kzvi71eD3w/mCpYRUY7cz6DX4bfYihGdI2yV3FYQ2JuZZenqAqDPz0gWj0ew6vlAtdEVBNb7p+Dm2TAIxpVYMA==}
-    engines: {node: '>=14.0.0'}
+  /aws-jwt-verify@5.2.1:
+    resolution: {integrity: sha512-J+buA4M+qvQDk58WXFBLkDodkEX3DDL1ac5XFQPW3opxAsaLXYu5hYnlSHsaBRDBUXBAn695kE/cw/mdyJKwJg==}
+    engines: {node: '>=18.0.0'}
     dev: false
 
   /aws-xray-sdk-core@3.12.0:

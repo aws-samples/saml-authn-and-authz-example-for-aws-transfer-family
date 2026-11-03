@@ -174,7 +174,9 @@ const main = async () => {
     majorVersion: 0,
     deps: [
       "@middy/core@4.7.0",
-      "aws-jwt-verify",
+      // Verifies Cognito access tokens in the auth path; see
+      // test/runtime/handlers/JwtVerification.test.ts before changing.
+      "aws-jwt-verify@^5.2.1",
       "@aws-crypto/sha256-js",
       "@aws-lambda-powertools/logger",
       "@aws-lambda-powertools/metrics",
