@@ -169,7 +169,7 @@
       },
       "steps": [
         {
-          "exec": "pnpm dlx npm-check-updates@16 --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=cdk-nag,eslint-import-resolver-typescript,projen,ts-node,typescript,vitest,@aws-crypto/sha256-js,@aws-lambda-powertools/logger,@aws-lambda-powertools/metrics,@aws-lambda-powertools/tracer,@aws-sdk/util-dynamodb,@middy/core,@smithy/protocol-http,@smithy/types,aws-xray-sdk"
+          "exec": "pnpm dlx npm-check-updates@16 --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=cdk-nag,eslint-import-resolver-typescript,projen,ts-node,typescript,vitest,@aws-crypto/sha256-js,@aws-lambda-powertools/logger,@aws-lambda-powertools/metrics,@aws-lambda-powertools/tracer,@aws-sdk/util-dynamodb,@smithy/protocol-http,@smithy/types,aws-xray-sdk"
         },
         {
           "exec": "pnpm i --no-frozen-lockfile"
