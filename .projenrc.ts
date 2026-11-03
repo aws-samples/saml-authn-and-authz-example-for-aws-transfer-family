@@ -36,8 +36,13 @@ const defaultReleaseBranch = "main";
 // here (and re-runs projen) when upgrading CDK.
 // - cdkVersion: minimum aws-cdk-lib version (rendered as ^cdkVersion).
 // - cdkCliVersion: the aws-cdk CLI, versioned separately (2.1000+) since 2025.
-const cdkVersion = "2.134.0";
-const cdkCliVersion = "2.1000.0";
+const cdkVersion = "2.275.0";
+const cdkCliVersion = "2.1147.0";
+// @types/node tracks the Lambda runtime (Runtime.NODEJS_LATEST = nodejs24.x),
+// not minNodeVersion, which projen would otherwise use (^20).
+const typesNodeVersion = "^24";
+// typescript-eslint parser and plugin must stay on the same major.
+const typescriptEslintVersion = "^8";
 // Version of the PR title lint action used in .github/workflows/pull-request-lint.yml.
 const semanticPrActionVersion = "v6.1.1";
 const nodeVersion = "20.11.1";
@@ -122,7 +127,7 @@ const main = async () => {
       "@npmcli/arborist",
       "@types/npm-packlist",
       "@types/npmcli__arborist",
-      "prettier"
+      "prettier@^3.9.10"
     ]
   });
 
@@ -174,33 +179,60 @@ const main = async () => {
       "@aws-lambda-powertools/logger",
       "@aws-lambda-powertools/metrics",
       "@aws-lambda-powertools/tracer",
-      "@aws-sdk/client-cognito-identity-provider",
-      "@aws-sdk/client-dynamodb",
-      "@aws-sdk/client-ssm",
-      "@aws-sdk/client-secrets-manager",
+      "@aws-sdk/client-cognito-identity-provider@^3.1161.0",
+      "@aws-sdk/client-dynamodb@^3.1161.0",
+      "@aws-sdk/client-ssm@^3.1161.0",
+      "@aws-sdk/client-secrets-manager@^3.1161.0",
       "@aws-sdk/util-dynamodb",
-      "@aws-sdk/types",
-      "@smithy/node-http-handler",
+      "@aws-sdk/types@^3.975.0",
+      "@smithy/node-http-handler@^4.14.1",
       "@smithy/protocol-http",
-      "@smithy/signature-v4",
+      "@smithy/signature-v4@^5.7.5",
       "@smithy/types",
       "aws-xray-sdk",
-      "@types/aws-lambda"
+      "@types/aws-lambda@^8.10.164"
     ] /* Runtime dependencies of this module. */,
     // description: undefined,  /* The description is just a string that helps people understand the purpose of the package. */
     devDeps: [
 
-      "aws-cdk-lib",
-      "cdk-assets",
+      `aws-cdk-lib@^${cdkVersion}`,
+      "cdk-assets@^4.8.0",
       "cdk-nag",
-      "sinon",
-      "@types/sinon",
+      "sinon@^22.1.0",
+      "@types/sinon@^22.0.2",
       "vitest"
     ]
   });
 
   // projen 0.80 adds aws-cdk@cdkVersion; replace it with the CLI's own version line.
   infrastructure.addDevDeps(`aws-cdk@^${cdkCliVersion}`);
+
+  // projen's awscdk and eslint components add these without a version after
+  // the constructor's devDeps are processed, so set them here.
+  infrastructure.addDevDeps("esbuild@^0.28.2", "eslint-plugin-import@^2.32.0");
+
+  // projen 0.80 adds @types/node@^<minNodeVersion major>; follow the Lambda runtime instead.
+  root.addDevDeps(`@types/node@${typesNodeVersion}`);
+  infrastructure.addDevDeps(`@types/node@${typesNodeVersion}`);
+
+  // projen 0.80 pins typescript-eslint to ^6. v8 removed the formatting rules
+  // projen's config uses (indent, member-delimiter-style); they live on in
+  // @stylistic/eslint-plugin (v2 is the last line that supports eslint 8).
+  infrastructure.addDevDeps(
+    `@typescript-eslint/eslint-plugin@${typescriptEslintVersion}`,
+    `@typescript-eslint/parser@${typescriptEslintVersion}`,
+    "@stylistic/eslint-plugin@^2"
+  );
+  if (infrastructure.eslint) {
+    const eslintFile = infrastructure.tryFindObjectFile(".eslintrc.json");
+    eslintFile?.addDeletionOverride("rules.@typescript-eslint/indent");
+    eslintFile?.addDeletionOverride("rules.@typescript-eslint/member-delimiter-style");
+    infrastructure.eslint.addPlugins("@stylistic");
+    infrastructure.eslint.addRules({
+      "@stylistic/indent": ["error", 2],
+      "@stylistic/member-delimiter-style": ["error"]
+    });
+  }
 
   // nx local cache
   root.gitignore.exclude(".nx/");

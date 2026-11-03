@@ -176,7 +176,7 @@
       },
       "steps": [
         {
-          "exec": "pnpm dlx npm-check-updates@16 --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@npmcli/arborist,@types/npm-packlist,@types/npmcli__arborist,prettier,projen,ts-node,typescript"
+          "exec": "pnpm dlx npm-check-updates@16 --upgrade --target=minor --peer --dep=dev,peer,prod,optional --filter=@npmcli/arborist,@types/npm-packlist,@types/npmcli__arborist,projen,ts-node,typescript"
         },
         {
           "exec": "pnpm i --no-frozen-lockfile"
