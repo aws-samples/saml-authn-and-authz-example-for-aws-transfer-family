@@ -29,15 +29,15 @@ import { APIGatewayProxyResult } from "aws-lambda/trigger/api-gateway-proxy";
 
 describe("ATFServerIdentityProvider", () => {
   let sb: SinonSandbox;
-  beforeEach(_args => {
+  beforeEach(() => {
     sb = createSandbox();
   });
 
-  afterEach(_args => {
+  afterEach(() => {
     sb.restore();
   });
 
-  beforeAll(_args => {
+  beforeAll(() => {
 
     vi.stubEnv("USER_POOL_ID", "6pdngjfd6aum39junvfvcb5mef");
     vi.stubEnv("BUCKET_NAME", "test_bucket");
