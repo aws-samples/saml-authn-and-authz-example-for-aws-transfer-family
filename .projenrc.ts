@@ -23,6 +23,8 @@ import { TypeScriptProject } from "projen/lib/typescript";
 import { PnpmWorkspace, workspacePackages } from "./projenrc/pnpm";
 // @ts-ignore
 import { Nx } from "./projenrc/nx";
+// @ts-ignore
+import { EslintFlatConfig } from "./projenrc/eslint";
 import { NodeProject, TypeScriptModuleResolution } from "projen/lib/javascript";
 // @ts-ignore
 import { overrideFormatting, zipLambdaFunction, zipRuntime } from "./projenrc/utils";
@@ -247,6 +249,9 @@ const main = async () => {
   root.tasks.addTask("prettier", {
     receiveArgs: true
   });
+  // ESLint 9 flat config (eslint.config.mjs) instead of .eslintrc.json. Must run
+  // before overrideFormatting, which adds the prettier step to the eslint task.
+  new EslintFlatConfig(infrastructure);
   overrideFormatting(infrastructure);
 
   [infrastructure].forEach(value => {

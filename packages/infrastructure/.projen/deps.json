@@ -16,16 +16,6 @@
       "type": "build"
     },
     {
-      "name": "@typescript-eslint/eslint-plugin",
-      "version": "^8",
-      "type": "build"
-    },
-    {
-      "name": "@typescript-eslint/parser",
-      "version": "^8",
-      "type": "build"
-    },
-    {
       "name": "aws-cdk-lib",
       "version": "^2.275.0",
       "type": "build"
@@ -74,6 +64,11 @@
     },
     {
       "name": "typescript",
+      "type": "build"
+    },
+    {
+      "name": "typescript-eslint",
+      "version": "^8",
       "type": "build"
     },
     {
