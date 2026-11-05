@@ -11,6 +11,7 @@
 /.projen/files.json linguist-generated
 /.projen/tasks.json linguist-generated
 /cdk.json linguist-generated
+/eslint.config.mjs linguist-generated
 /package.json linguist-generated
 /pnpm-lock.yaml linguist-generated
 /pnpm-workspace.yaml linguist-generated

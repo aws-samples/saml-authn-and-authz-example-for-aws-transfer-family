@@ -90,15 +90,12 @@
       "name": "eslint",
       "description": "Runs eslint against the codebase",
       "env": {
-        "ESLINT_USE_FLAT_CONFIG": "false",
         "NODE_NO_WARNINGS": "1"
       },
       "steps": [
         {
           "execArgs": [
             "eslint",
-            "--ext",
-            ".ts,.tsx",
             "--fix",
             "--no-error-on-unmatched-pattern",
             "$@",

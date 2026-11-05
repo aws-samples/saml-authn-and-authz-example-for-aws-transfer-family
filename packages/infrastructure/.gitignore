@@ -42,3 +42,4 @@ jspm_packages/
 /cdk.out/
 .cdk.staging/
 .parcel-cache/
+!/eslint.config.mjs

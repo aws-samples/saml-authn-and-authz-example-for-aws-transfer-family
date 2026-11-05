@@ -1,6 +1,5 @@
 {
   "files": [
-    ".eslintrc.json",
     ".gitattributes",
     ".gitignore",
     ".npmignore",
@@ -9,6 +8,7 @@
     ".projen/files.json",
     ".projen/tasks.json",
     "cdk.json",
+    "eslint.config.mjs",
     "test/tsconfig.json",
     "tsconfig.json"
   ],
