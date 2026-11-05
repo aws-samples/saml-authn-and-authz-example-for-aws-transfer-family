@@ -16,25 +16,32 @@
  */
 
 import path from 'path';
-import {Component, Project, YamlFile} from 'projen';
+import {Component, Project} from 'projen';
 
-// Custom projen component that generates pnpm-workspace.yaml
-
-// and defines the monorepo packages based on the subprojects.
+// Lists the monorepo packages in pnpm-workspace.yaml based on the subprojects.
+//
+// projen 0.104+ owns pnpm-workspace.yaml itself (PnpmWorkspaceYaml, added to
+// every pnpm project) and builds it from the root project's
+// `pnpmOptions.workspaceYamlOptions`. Subprojects do not exist yet when the
+// root project is constructed, so the root passes this array as
+// `workspaceYamlOptions.packages` and this component fills it in once the
+// subprojects have been created. projen reads the array when it synthesizes
+// the file, so the paths end up in pnpm-workspace.yaml.
+export const workspacePackages: string[] = [];
 
 
 export class PnpmWorkspace extends Component {
 	constructor(rootProject: Project) {
 		super(rootProject);
 
-		new YamlFile(rootProject, 'pnpm-workspace.yaml', {
-			obj: {
-				packages: rootProject.subprojects.map(
-					project => path.relative(
-						rootProject.outdir, project.outdir
-					)
-				),
-			},
-		});
+		workspacePackages.splice(
+			0,
+			workspacePackages.length,
+			...rootProject.subprojects.map(
+				project => path.relative(
+					rootProject.outdir, project.outdir
+				)
+			),
+		);
 	}
 }

@@ -20,7 +20,7 @@ import { ReleaseTrigger } from "projen/lib/release";
 
 import { TypeScriptProject } from "projen/lib/typescript";
 // @ts-ignore
-import { PnpmWorkspace } from "./projenrc/pnpm";
+import { PnpmWorkspace, workspacePackages } from "./projenrc/pnpm";
 // @ts-ignore
 import { Nx } from "./projenrc/nx";
 import { NodeProject, TypeScriptModuleResolution } from "projen/lib/javascript";
@@ -41,10 +41,10 @@ const cdkCliVersion = "2.1147.0";
 // @types/node tracks the Lambda runtime (Runtime.NODEJS_LATEST = nodejs24.x),
 // not minNodeVersion, which projen would otherwise use (^20).
 const typesNodeVersion = "^24";
-// typescript-eslint parser and plugin must stay on the same major.
-const typescriptEslintVersion = "^8";
-// Version of the PR title lint action used in .github/workflows/pull-request-lint.yml.
-const semanticPrActionVersion = "v6.1.1";
+// projen itself. ^ on a 0.x version only allows patch updates (0.104.x), so
+// Dependabot's lockfile-only updates stay on this minor line. Bump it here and
+// re-run projen to move to a newer minor.
+const projenVersion = "^0.104.25";
 const nodeVersion = "20.11.1";
 const pnpmVersion = "8.15.3";
 const jsiiReleaseVersion = "1.94.0";
@@ -97,6 +97,10 @@ const main = async () => {
     defaultReleaseBranch,
     packageManager: javascript.NodePackageManager.PNPM,
     projenCommand: "pnpm dlx projen",
+    projenVersion,
+    pnpmVersion,
+    // Filled in by PnpmWorkspace once the subprojects exist.
+    pnpmOptions: { workspaceYamlOptions: { packages: workspacePackages } },
     minNodeVersion: nodeVersion,
     projenrcTs: true,
     sampleCode: false,
@@ -138,10 +142,13 @@ const main = async () => {
     outdir: "./packages/infrastructure",
     parent: root,
     cdkVersion,
+    cdkCliVersion: `^${cdkCliVersion}`,
     defaultReleaseBranch,
 
     packageManager: root.package.packageManager,
     projenCommand: root.projenCommand,
+    projenVersion,
+    pnpmVersion,
     minNodeVersion: root.minNodeVersion,
     projenrcTs: true,
     sampleCode: false,
@@ -154,6 +161,13 @@ const main = async () => {
     tsconfig: {
       compilerOptions: {
         target: "ESNext",
+        // projen 0.104's awscdk defaults switched to module NodeNext and
+        // turned these checks off; keep the values this project used before.
+        module: "CommonJS",
+        noUnusedLocals: true,
+        noUnusedParameters: true,
+        noFallthroughCasesInSwitch: true,
+        strictPropertyInitialization: true,
         esModuleInterop: true,
         allowSyntheticDefaultImports: true,
         moduleResolution: TypeScriptModuleResolution.BUNDLER,
@@ -206,53 +220,19 @@ const main = async () => {
     ]
   });
 
-  // projen 0.80 adds aws-cdk@cdkVersion; replace it with the CLI's own version line.
-  infrastructure.addDevDeps(`aws-cdk@^${cdkCliVersion}`);
-
   // projen's awscdk and eslint components add these without a version after
   // the constructor's devDeps are processed, so set them here.
   infrastructure.addDevDeps("esbuild@^0.28.2", "eslint-plugin-import@^2.32.0");
 
-  // projen 0.80 adds @types/node@^<minNodeVersion major>; follow the Lambda runtime instead.
+  // projen adds @types/node@^<minNodeVersion major>; follow the Lambda runtime instead.
   root.addDevDeps(`@types/node@${typesNodeVersion}`);
   infrastructure.addDevDeps(`@types/node@${typesNodeVersion}`);
-
-  // projen 0.80 pins typescript-eslint to ^6. v8 removed the formatting rules
-  // projen's config uses (indent, member-delimiter-style); they live on in
-  // @stylistic/eslint-plugin (v2 is the last line that supports eslint 8).
-  infrastructure.addDevDeps(
-    `@typescript-eslint/eslint-plugin@${typescriptEslintVersion}`,
-    `@typescript-eslint/parser@${typescriptEslintVersion}`,
-    "@stylistic/eslint-plugin@^2"
-  );
-  if (infrastructure.eslint) {
-    const eslintFile = infrastructure.tryFindObjectFile(".eslintrc.json");
-    eslintFile?.addDeletionOverride("rules.@typescript-eslint/indent");
-    eslintFile?.addDeletionOverride("rules.@typescript-eslint/member-delimiter-style");
-    infrastructure.eslint.addPlugins("@stylistic");
-    infrastructure.eslint.addRules({
-      "@stylistic/indent": ["error", 2],
-      "@stylistic/member-delimiter-style": ["error"]
-    });
-  }
 
   // nx local cache
   root.gitignore.exclude(".nx/");
 
-  // projen 0.80 hard-codes amannn/action-semantic-pull-request@v5.4.0 in the
-  // generated pull-request-lint workflow and has no option for it, so set the
-  // version here. Bump it here (not in the .yml) when Dependabot proposes a
-  // newer release, or the next projen run reverts the change.
-  root.github
-    ?.tryFindWorkflow("pull-request-lint")
-    ?.file?.addOverride(
-      "jobs.validate.steps.0.uses",
-      `amannn/action-semantic-pull-request@${semanticPrActionVersion}`
-    );
-
   new PnpmWorkspace(root);
   new Nx(root); // add nx to root
-  root.package.addField("packageManager", `pnpm@${pnpmVersion}`);
   root.package.addField("pnpm", { overrides: pnpmOverrides });
   root.npmrc.addConfig("auto-install-peers", "true");
   root.tasks.addTask("nx", {

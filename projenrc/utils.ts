@@ -118,10 +118,12 @@ export function zipLambdaFunction(filePath: string, esBuildExternal: string): Ta
 }
 
 export function overrideFormatting(p: TypeScriptProject) {
+  // projen 0.104+ configures max-len through @stylistic/eslint-plugin, so the
+  // override has to target @stylistic/max-len (not the core max-len rule).
   p.eslint?.addOverride({
     files: ["*"],
     rules: {
-      "max-len": ["error",
+      "@stylistic/max-len": ["error",
         {
           code: 180,
           ignoreUrls: true,
