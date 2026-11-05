@@ -112,6 +112,13 @@ export class TransferFamilyWithSamlStack extends Stack {
         reason: "Auth router endpoint needs to be public",
       },
     ]);
+    NagSuppressions.addResourceSuppressionsByPath(this, `/${this.stackName}/ATFServerWithSaml/Cognito/UserPool/Resource`, [
+      {
+        id: "AwsSolutions-COG8",
+        reason:
+          "Sample deployment: the Cognito Plus feature plan (threat protection) is billed per monthly active user and would add cost for everyone who deploys this sample. Production deployments should enable the Plus feature plan and threat protection.",
+      },
+    ]);
     NagSuppressions.addResourceSuppressionsByPath(this, `/${this.stackName}/ATFServerWithSaml/AccessLogsBucket/Resource`, [
       {
         id: "AwsSolutions-S1",

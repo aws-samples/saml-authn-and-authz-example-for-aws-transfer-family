@@ -44,3 +44,23 @@ The permissions are mapped to the following S3 actions
 1. `pnpm install`
 2. `projen deploy`
 
+
+# Security considerations
+
+## Cognito threat protection and feature plan (cdk-nag `AwsSolutions-COG8`)
+
+This sample runs without Cognito threat protection (formerly advanced security). The user pool stays on the default feature plan (Essentials for a new user pool) and the cdk-nag rule `AwsSolutions-COG8`, which asks for the Plus feature plan, is suppressed. Threat protection requires the Plus plan, which is billed per monthly active user, so enabling it here would add cost for everyone who deploys the sample.
+
+For production deployments, enable the Plus feature plan and threat protection. In `packages/infrastructure/src/constructs/CognitoAuthorization.ts`, set these properties on the `UserPool`:
+
+```typescript
+import { FeaturePlan, StandardThreatProtectionMode } from "aws-cdk-lib/aws-cognito";
+
+new UserPool(this, "UserPool", {
+  // ...existing properties
+  featurePlan: FeaturePlan.PLUS,
+  standardThreatProtectionMode: StandardThreatProtectionMode.FULL_FUNCTION,
+});
+```
+
+Then remove the `AwsSolutions-COG8` suppression from `packages/infrastructure/src/stacks/TransferFamilyWithSamlStack.ts`. See [Cognito feature plans](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-sign-in-feature-plans.html) and [threat protection](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pool-settings-threat-protection.html) for details and pricing.

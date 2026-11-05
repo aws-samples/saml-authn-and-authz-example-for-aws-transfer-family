@@ -16,16 +16,7 @@
  */
 
 import { Aws, CfnOutput, Duration, RemovalPolicy } from "aws-cdk-lib";
-import {
-  AdvancedSecurityMode,
-  CustomDomainOptions,
-  OAuthScope,
-  StringAttribute,
-  UserPool,
-  UserPoolClientIdentityProvider,
-  UserPoolDomain,
-  UserPoolIdentityProviderSaml,
-} from "aws-cdk-lib/aws-cognito";
+import { CustomDomainOptions, OAuthScope, StringAttribute, UserPool, UserPoolClientIdentityProvider, UserPoolDomain, UserPoolIdentityProviderSaml } from "aws-cdk-lib/aws-cognito";
 
 import { CnameRecord, IHostedZone } from "aws-cdk-lib/aws-route53";
 import { Construct, Dependable, IDependable } from "constructs";
@@ -60,7 +51,6 @@ export class CognitoAuthorization extends Construct implements IDependable {
     const userPoolName = "ATFWithSamlUserPool";
     this.userPool = new UserPool(this, "UserPool", {
       userPoolName: userPoolName,
-      advancedSecurityMode: AdvancedSecurityMode.ENFORCED,
       signInAliases: {
         email: true,
         username: false,
