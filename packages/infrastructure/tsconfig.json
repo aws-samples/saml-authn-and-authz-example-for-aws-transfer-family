@@ -10,7 +10,7 @@
     "inlineSourceMap": true,
     "inlineSources": true,
     "lib": [
-      "es2019"
+      "es2022"
     ],
     "module": "CommonJS",
     "noEmitOnError": false,
@@ -26,8 +26,16 @@
     "strictPropertyInitialization": true,
     "stripInternal": true,
     "target": "ESNext",
-    "allowSyntheticDefaultImports": true,
+    "types": [
+      "node",
+      "sinon",
+      "aws-lambda"
+    ],
     "moduleResolution": "bundler",
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
+    "allowSyntheticDefaultImports": true,
     "noEmit": true,
     "isolatedModules": true
   },
@@ -35,6 +43,7 @@
     "src/**/*.ts"
   ],
   "exclude": [
+    "node_modules",
     "cdk.out"
   ]
 }
