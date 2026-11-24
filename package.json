@@ -20,7 +20,7 @@
     "projen": "pnpm dlx projen"
   },
   "devDependencies": {
-    "@npmcli/arborist": "^7.4.0",
+    "@npmcli/arborist": "^10.0.5",
     "@nx/devkit": "^22.7.12",
     "@nx/workspace": "^22.7.12",
     "@types/node": "^24",
@@ -68,7 +68,9 @@
       "postcss-selector-parser@<7.1.6": ">=7.1.6 <8.0.0",
       "@smithy/config-resolver@<4.4.0": ">=4.4.0 <5.0.0",
       "axios@>=1.0.0 <1.20.0": ">=1.20.0 <2.0.0",
-      "smol-toml@<1.7.1": ">=1.7.1 <2.0.0"
+      "smol-toml@<1.7.1": ">=1.7.1 <2.0.0",
+      "diff@>=4.0.0 <4.0.4": ">=4.0.4 <5.0.0",
+      "cacache@>=21.0.0 <21.0.2": ">=21.0.2 <22.0.0"
     }
   },
   "engines": {

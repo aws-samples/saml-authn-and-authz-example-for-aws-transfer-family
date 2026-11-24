@@ -215,7 +215,7 @@
             "--peer",
             "--no-deprecated",
             "--dep=dev,prod,peer,optional",
-            "--filter=@npmcli/arborist,@types/npm-packlist,@types/npmcli__arborist,ts-node,typescript"
+            "--filter=@types/npm-packlist,@types/npmcli__arborist,ts-node,typescript"
           ]
         },
         {

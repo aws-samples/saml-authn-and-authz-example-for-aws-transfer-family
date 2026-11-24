@@ -94,7 +94,10 @@ const pnpmOverrides: Record<string, string> = {
   "postcss-selector-parser@<7.1.6": ">=7.1.6 <8.0.0",
   "@smithy/config-resolver@<4.4.0": ">=4.4.0 <5.0.0",
   "axios@>=1.0.0 <1.20.0": ">=1.20.0 <2.0.0",
-  "smol-toml@<1.7.1": ">=1.7.1 <2.0.0"
+  "smol-toml@<1.7.1": ">=1.7.1 <2.0.0",
+  "diff@>=4.0.0 <4.0.4": ">=4.0.4 <5.0.0",
+  // cacache 21.0.2 moves to glob ^14.0.3, dropping glob 13 (GHSA-3g3m-2fjr-6pw4).
+  "cacache@>=21.0.0 <21.0.2": ">=21.0.2 <22.0.0"
 };
 
 const main = async () => {
@@ -134,7 +137,9 @@ const main = async () => {
     buildWorkflow: false,
     release: false,
     devDeps: [
-      "@npmcli/arborist",
+      // ^10.0.5 depends on pacote ^22, which fixes GHSA-w4pp-8pjf-rmxw
+      // (pacote <21.5.1). Used by projenrc/utils.ts to build zip-runtime.
+      "@npmcli/arborist@^10.0.5",
       "@types/npm-packlist",
       "@types/npmcli__arborist",
       "prettier@^3.9.10"
