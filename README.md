@@ -41,6 +41,8 @@ The permissions are mapped to the following S3 actions
 
 *Requires AWS credentials on the terminal* 
 
+Prerequisites: Node.js 24.15.0 or later and pnpm 8.15.3.
+
 1. `pnpm install`
 2. `projen deploy`
 

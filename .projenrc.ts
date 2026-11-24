@@ -41,7 +41,7 @@ const defaultReleaseBranch = "main";
 const cdkVersion = "2.275.0";
 const cdkCliVersion = "2.1147.0";
 // @types/node tracks the Lambda runtime (Runtime.NODEJS_LATEST = nodejs24.x),
-// not minNodeVersion, which projen would otherwise use (^20).
+// independently of minNodeVersion, which projen would otherwise use.
 const typesNodeVersion = "^24";
 // projen itself. ^ on a 0.x version only allows patch updates (0.104.x), so
 // Dependabot's lockfile-only updates stay on this minor line. Bump it here and
@@ -51,7 +51,9 @@ const projenVersion = "^0.104.25";
 // commit SHA. projen 0.104.x still pins v6.1.1, so this overrides its pin.
 // Remove the override once projen pins this version (or newer) itself.
 const semanticPrAction = "amannn/action-semantic-pull-request@2252a14e810aa9b85c2d560bd7070c802206ecf6"; // v6.1.2
-const nodeVersion = "20.11.1";
+// Minimum Node.js for contributors and tooling (rendered as engines.node).
+// @npmcli/arborist 10 requires ^22.22.2 || ^24.15.0 || >=26; Node 20 is EOL.
+const nodeVersion = "24.15.0";
 const pnpmVersion = "8.15.3";
 const jsiiReleaseVersion = "1.94.0";
 const namespace = "@saml-authn-and-authz-example-for-aws-transfer-family";
