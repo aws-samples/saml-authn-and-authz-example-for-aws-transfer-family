@@ -41,7 +41,7 @@ const defaultReleaseBranch = "main";
 const cdkVersion = "2.275.0";
 const cdkCliVersion = "2.1147.0";
 // @types/node tracks the Lambda runtime (Runtime.NODEJS_LATEST = nodejs24.x),
-// not minNodeVersion, which projen would otherwise use (^20).
+// independently of minNodeVersion, which projen would otherwise use.
 const typesNodeVersion = "^24";
 // projen itself. ^ on a 0.x version only allows patch updates (0.104.x), so
 // Dependabot's lockfile-only updates stay on this minor line. Bump it here and
@@ -51,7 +51,9 @@ const projenVersion = "^0.104.25";
 // commit SHA. projen 0.104.x still pins v6.1.1, so this overrides its pin.
 // Remove the override once projen pins this version (or newer) itself.
 const semanticPrAction = "amannn/action-semantic-pull-request@2252a14e810aa9b85c2d560bd7070c802206ecf6"; // v6.1.2
-const nodeVersion = "20.11.1";
+// Minimum Node.js for contributors and tooling (rendered as engines.node).
+// @npmcli/arborist 10 requires ^22.22.2 || ^24.15.0 || >=26; Node 20 is EOL.
+const nodeVersion = "24.15.0";
 const pnpmVersion = "8.15.3";
 const jsiiReleaseVersion = "1.94.0";
 const namespace = "@saml-authn-and-authz-example-for-aws-transfer-family";
@@ -94,7 +96,10 @@ const pnpmOverrides: Record<string, string> = {
   "postcss-selector-parser@<7.1.6": ">=7.1.6 <8.0.0",
   "@smithy/config-resolver@<4.4.0": ">=4.4.0 <5.0.0",
   "axios@>=1.0.0 <1.20.0": ">=1.20.0 <2.0.0",
-  "smol-toml@<1.7.1": ">=1.7.1 <2.0.0"
+  "smol-toml@<1.7.1": ">=1.7.1 <2.0.0",
+  "diff@>=4.0.0 <4.0.4": ">=4.0.4 <5.0.0",
+  // cacache 21.0.2 moves to glob ^14.0.3, dropping glob 13 (GHSA-3g3m-2fjr-6pw4).
+  "cacache@>=21.0.0 <21.0.2": ">=21.0.2 <22.0.0"
 };
 
 const main = async () => {
@@ -134,7 +139,9 @@ const main = async () => {
     buildWorkflow: false,
     release: false,
     devDeps: [
-      "@npmcli/arborist",
+      // ^10.0.5 depends on pacote ^22, which fixes GHSA-w4pp-8pjf-rmxw
+      // (pacote <21.5.1). Used by projenrc/utils.ts to build zip-runtime.
+      "@npmcli/arborist@^10.0.5",
       "@types/npm-packlist",
       "@types/npmcli__arborist",
       "prettier@^3.9.10"

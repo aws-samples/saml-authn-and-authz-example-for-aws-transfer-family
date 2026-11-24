@@ -61,7 +61,7 @@
     "constructs": "^10.5.1"
   },
   "engines": {
-    "node": ">= 20.11.1"
+    "node": ">= 24.15.0"
   },
   "devEngines": {
     "packageManager": {

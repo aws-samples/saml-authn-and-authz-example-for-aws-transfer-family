@@ -2,6 +2,7 @@
   "dependencies": [
     {
       "name": "@npmcli/arborist",
+      "version": "^10.0.5",
       "type": "build"
     },
     {
