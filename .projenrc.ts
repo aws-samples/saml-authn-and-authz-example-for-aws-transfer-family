@@ -50,7 +50,7 @@ const projenVersion = "^0.104.25";
 // PR title lint action for .github/workflows/pull-request-lint.yml, pinned by
 // commit SHA. projen 0.104.x still pins v6.1.1, so this overrides its pin.
 // Remove the override once projen pins this version (or newer) itself.
-const semanticPrAction = "amannn/action-semantic-pull-request@2252a14e810aa9b85c2d560bd7070c802206ecf6"; // v6.1.2
+const semanticPrAction = "amannn/action-semantic-pull-request@66e72920af32222769c386d81f89656ebcb6d6d5"; // v6.1.4
 // Minimum Node.js for contributors and tooling (rendered as engines.node).
 // @npmcli/arborist 10 requires ^22.22.2 || ^24.15.0 || >=26; Node 20 is EOL.
 const nodeVersion = "24.15.0";
